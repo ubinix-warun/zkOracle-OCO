@@ -1,6 +1,7 @@
 # zkOracle and Off-chain operator
 
-> TBD: Best use case that suits Mina's native propoerties, IoT: provable edge computations.
+> TBD: Best use case that suits Mina's native propoerties
+>> IoT: provable edge computations.
 
 - Milestone 0: Design a domain model.
 - Milestone 1: Create a domain model (almost an SDK with Structs, Programs, Contracts, etc.) with o1js that articulates your project's foundations.
