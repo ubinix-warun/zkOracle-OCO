@@ -8,6 +8,7 @@
 - Milestone 2: Develop unit tests for the domain model to ensure each component works as intended.
 - Milestone 3: Extend the domain model to integrate it with existing projects or utilize it for a new idea. This will involve actual coding and integration tasks.
 - Milestone 4: Draft comprehensive documentation. Start with the README in the main repository, then move to more detailed docs using frameworks like NextJS. Make sure you provide a clear overview, diagrams, a getting started guide, and explain the relevance of "why Mina.”
+* [docs](docs)
 - Milestone 5: Incorporate integration and end-to-end tests. This ensures that the complete application or tool works seamlessly and is free of major bugs.
 - Bonus Milestone: Track and improve test coverage, targeting a specific percentage (e.g., 80% or more). Display a badge in the repository to showcase the coverage.
 - Bonus Milestone: Educational content for your contribution
