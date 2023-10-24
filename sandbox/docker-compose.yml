@@ -1,0 +1,29 @@
+services:
+  daemon:
+    container_name: mina
+    image: minaprotocol/mina-daemon:1.4.0-c980ba8-bullseye-devnet
+    ports:
+      - "3085:3085"
+    environment:
+      - RUN_DEMO=true
+      - MINA_PRIVKEY_PASS=''
+    networks:
+      - fm-mina
+
+  # archive:
+  #   container_name: mina
+  #   image: minaprotocol/mina-archive:1.4.0-c980ba8-bullseye
+  #   # ports:
+  #   #   - "3085:3085"
+  #   # environment:
+  #   #   - RUN_DEMO=true
+  #   #   - MINA_PRIVKEY_PASS=''
+  #   networks:
+  #     - fm-mina
+
+  #         TestWorld = 2.0.0rampup6-4061884-bullseye-berkeley
+  #         TestWorld = 2.0.0rampup6-4061884-bullseye
+
+networks:
+  fm-mina:
+    name: fm-mina

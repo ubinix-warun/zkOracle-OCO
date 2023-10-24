@@ -7,6 +7,7 @@ the zkApps Hackathon & Grant -- [Mina Navigators Program](https://minaprotocol.c
 - Milestone 0: Design a domain model.
     * [ERC677](https://github.com/ethereum/EIPs/issues/677)
 - Milestone 1: Create a domain model (almost an SDK with Structs, Programs, Contracts, etc.) with o1js that articulates your project's foundations.
+    * [oracles/price-feed-operator](oracles/price-feed-operator)  
 - Milestone 2: Develop unit tests for the domain model to ensure each component works as intended.
 - Milestone 3: Extend the domain model to integrate it with existing projects or utilize it for a new idea. This will involve actual coding and integration tasks.
     * [zkOracle-OFW](https://github.com/ubinix-warun/zkOracle-OCW)
