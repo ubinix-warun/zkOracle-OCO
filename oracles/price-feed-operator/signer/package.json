@@ -1,5 +1,5 @@
 {
-  "name": "price-feed-operator",
+  "name": "price-feed-signer",
   "version": "0.1.0",
   "private": true,
   "scripts": {
