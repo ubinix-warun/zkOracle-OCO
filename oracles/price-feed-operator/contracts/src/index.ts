@@ -1,3 +1,7 @@
-import { Add } from './Add.js';
+// import { WhitelistedTokenContract } from './WhitelistedTokenContract.js';
+import { FeedCoinContract } from './FeedTokenContract.js';
 
-export { Add };
+export { 
+    FeedCoinContract, 
+    // WhitelistedTokenContract 
+};
