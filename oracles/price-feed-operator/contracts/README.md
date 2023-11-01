@@ -1,4 +1,4 @@
-# Mina zkApp: PROJECT_NAME
+# Mina zkApp: zkOracle/price-feed-operator
 
 This template uses TypeScript.
 
