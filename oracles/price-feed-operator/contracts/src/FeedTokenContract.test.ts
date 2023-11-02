@@ -9,116 +9,20 @@ import {
   UInt64,
   Signature,
   Field,
+  TokenId,
 } from 'o1js';
+import { Erc20Contract } from './feedERC20.js';
 
-
-// // let feePayerKey: PrivateKey;
-// // let feePayer: PublicKey;
-// // let tokenZkappKey: PrivateKey;
-// // let tokenZkappAddress: PublicKey;
-// // let tokenZkapp: FeedTokenContract;
-// // let tokenId: Field;
-
-// // let zkAppBKey: PrivateKey;
-// // let zkAppBAddress: PublicKey;
-// // let zkAppB: ZkAppB;
-
-// // let zkAppCKey: PrivateKey;
-// // let zkAppCAddress: PublicKey;
-// // let zkAppC: ZkAppC;
-
-// function setupAccounts() {
-//   let Local = Mina.LocalBlockchain({
-//     proofsEnabled: true,
-//     enforceTransactionLimits: false,
-//   });
-//   Mina.setActiveInstance(Local);
-//   feePayerKey = Local.testAccounts[0].privateKey;
-//   feePayer = Local.testAccounts[0].publicKey;
-
-//   tokenZkappKey = PrivateKey.random();
-//   tokenZkappAddress = tokenZkappKey.toPublicKey();
-
-//   tokenZkapp = new FeedTokenContract(tokenZkappAddress);
-//   tokenId = tokenZkapp.token.id;
-
-//   // zkAppBKey = Local.testAccounts[1].privateKey;
-//   // zkAppBAddress = zkAppBKey.toPublicKey();
-//   // zkAppB = new ZkAppB(zkAppBAddress, tokenId);
-
-//   // zkAppCKey = Local.testAccounts[2].privateKey;
-//   // zkAppCAddress = zkAppCKey.toPublicKey();
-//   // zkAppC = new ZkAppC(zkAppCAddress, tokenId);
-
-//   return Local;
-// }
-
-// // async function localDeploy(
-// //   zkAppInstance: FeedTokenContract,
-// //   zkAppPrivateKey: PrivateKey,
-// //   deployerAccount: PrivateKey,
-// //   verificationKey: {
-// //     data: string;
-// //     hash: Field;
-// //   }
-// // ) {
-// //   const deploy_txn = await Mina.transaction(deployerAccount.toPublicKey(), () => {
-// //     AccountUpdate.fundNewAccount(deployerAccount.toPublicKey());
-// //     zkAppInstance.deploy({ verificationKey, zkappKey: zkAppPrivateKey });
-// //   });
-// //   await deploy_txn.prove();
-// //   await deploy_txn.sign([deployerAccount]).send();
-
-// // }
-
-// async function setupLocal() {
-//   setupAccounts();
-//   let tx = await Mina.transaction(feePayer, () => {
-//     let feePayerUpdate = AccountUpdate.fundNewAccount(feePayer);
-//     feePayerUpdate.send({
-//       to: tokenZkappAddress,
-//       amount: Mina.accountCreationFee(),
-//     });
-//     tokenZkapp.deploy();
-//   });
-//   tx.sign([tokenZkappKey, 
-//     feePayerKey]);
-//   await tx.send();
-// }
-
-// async function setupLocalProofs() {
-//   let Local = setupAccounts();
-//   // // zkAppC = new ZkAppC(zkAppCAddress, tokenId);
-//   // don't use proofs for the setup, takes too long to do this every time
-//   Local.setProofsEnabled(false);
-//   let tx = await Mina.transaction({ sender: feePayer }, () => {
-//     let feePayerUpdate = AccountUpdate.fundNewAccount(feePayer, 3);
-//     feePayerUpdate.send({
-//       to: tokenZkappAddress,
-//       amount: Mina.accountCreationFee(),
-//     });
-//     tokenZkapp.deploy();
-//     // // tokenZkapp.deployZkapp(zkAppBAddress, ZkAppB._verificationKey!);
-//     // // tokenZkapp.deployZkapp(zkAppCAddress, ZkAppC._verificationKey!);
-//   });
-//   await tx.prove();
-//   tx.sign([tokenZkappKey, 
-//     // zkAppBKey, zkAppCKey, 
-//     feePayerKey]);
-//   await tx.send();
-//   Local.setProofsEnabled(true);
-// }
 
 function createLocalBlockchain() {
   let Local = Mina.LocalBlockchain({
-    proofsEnabled: true,
+    // proofsEnabled: true,
+    proofsEnabled: false,
     enforceTransactionLimits: false,
   });
   Mina.setActiveInstance(Local);
-  // feePayerKey = Local.testAccounts[0].privateKey;
-  // feePayer = Local.testAccounts[0].publicKey;
 
-  return Local.testAccounts[0].privateKey;
+  return Local.testAccounts[0].privateKey; // feePayerKey => deployerAccount
 }
 
 async function localDeploy(
@@ -126,32 +30,26 @@ async function localDeploy(
   zkAppPrivatekey: PrivateKey,
   deployerAccount: PrivateKey
 ) {
-  // let tx = await Mina.transaction(deployerAccount, () => {
-  //   let feePayerUpdate = AccountUpdate.fundNewAccount(deployerAccount);
-  //   feePayerUpdate.send({
-  //     to: zkAppPrivatekey.toPublicKey(),
-  //     amount: Mina.accountCreationFee(),
-  //   });
-  //   zkAppInstance.deploy();
-  // });
-  // tx.sign([tokenZkappKey, deployerAccount]);
-  // await tx.send();
-
+  const txn = await Mina.transaction(deployerAccount, () => {
+    AccountUpdate.fundNewAccount(deployerAccount);
+    zkAppInstance.deploy();
+  });
+  await txn.prove();
+  await txn.sign([deployerAccount, zkAppPrivatekey]).send();
+  // txn.sign([zkAppPrivatekey]);
+  // await txn.send();
 }
+
 
 describe('FeedToken', () => {
 
   let deployerAccount: PrivateKey,
     zkAppAddress: PublicKey,
-    zkAppPrivateKey: PrivateKey,
-    verificationKeyCompiled: {
-      data: string;
-      hash: Field;
-    }
+    zkAppPrivateKey: PrivateKey;
 
   beforeAll(async () => {
-    let { verificationKey } = await FeedTokenContract.compile();
-    verificationKeyCompiled = verificationKey;
+    await Erc20Contract.compile();
+    await FeedTokenContract.compile();
 
     // await ZkAppB.compile();
     // await ZkAppC.compile();
@@ -178,14 +76,17 @@ describe('FeedToken', () => {
       beforeEach(async () => {
         // await setupLocal();
         deployerAccount = createLocalBlockchain();
-        zkAppPrivateKey = PrivateKey.random();
-        zkAppAddress = zkAppPrivateKey.toPublicKey();
+        zkAppPrivateKey = PrivateKey.random(); // tokenZkappKey
+        zkAppAddress = zkAppPrivateKey.toPublicKey(); // tokenZkappAddress
 
       });
 
-      test('correct token id can be derived with an existing token owner', () => {
-        // expect(tokenId).toEqual(TokenId.derive(tokenZkappAddress));
-        it.todo('should be correct');
+      test('correct token id can be derived with an existing token owner', async () => {
+        const zkAppInstance = new FeedTokenContract(zkAppAddress);
+        await localDeploy(zkAppInstance, zkAppPrivateKey, deployerAccount);
+
+        // console.log(zkAppInstance.tokenId.toString());
+        // expect(zkAppInstance.tokenId.toString()).toEqual(TokenId.derive(zkAppAddress));
       });
     });
 

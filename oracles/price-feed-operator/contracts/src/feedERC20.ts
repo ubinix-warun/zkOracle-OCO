@@ -65,7 +65,7 @@ import {
     // constant supply
     SUPPLY = UInt64.from(10n ** 18n);
   
-    deploy(args: DeployArgs) {
+    deploy(args?: DeployArgs) {
       super.deploy(args);
       this.account.tokenSymbol.set('FEED');
       this.account.permissions.set({
