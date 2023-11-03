@@ -1,4 +1,4 @@
-import { Add } from './Add';
+import { MathToken } from './MathToken';
 import { Field, Mina, PrivateKey, PublicKey, AccountUpdate } from 'o1js';
 
 /*
@@ -10,17 +10,17 @@ import { Field, Mina, PrivateKey, PublicKey, AccountUpdate } from 'o1js';
 
 let proofsEnabled = false;
 
-describe('Add', () => {
+describe('MathToken', () => {
   let deployerAccount: PublicKey,
     deployerKey: PrivateKey,
     senderAccount: PublicKey,
     senderKey: PrivateKey,
     zkAppAddress: PublicKey,
     zkAppPrivateKey: PrivateKey,
-    zkApp: Add;
+    zkApp: MathToken;
 
   beforeAll(async () => {
-    if (proofsEnabled) await Add.compile();
+    if (proofsEnabled) await MathToken.compile();
   });
 
   beforeEach(() => {
@@ -32,7 +32,7 @@ describe('Add', () => {
       Local.testAccounts[1]);
     zkAppPrivateKey = PrivateKey.random();
     zkAppAddress = zkAppPrivateKey.toPublicKey();
-    zkApp = new Add(zkAppAddress);
+    zkApp = new MathToken(zkAppAddress);
   });
 
   async function localDeploy() {
@@ -45,13 +45,13 @@ describe('Add', () => {
     await txn.sign([deployerKey, zkAppPrivateKey]).send();
   }
 
-  it('generates and deploys the `Add` smart contract', async () => {
+  it('generates and deploys the `MathToken` smart contract', async () => {
     await localDeploy();
     const num = zkApp.num.get();
     expect(num).toEqual(Field(1));
   });
 
-  it('correctly updates the num state on the `Add` smart contract', async () => {
+  it('correctly updates the num state on the `MathToken` smart contract', async () => {
     await localDeploy();
 
     // update transaction
