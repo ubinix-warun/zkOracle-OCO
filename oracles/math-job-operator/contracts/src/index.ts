@@ -1,3 +1,3 @@
-import { Add } from './Add.js';
+import { MathToken } from './MathToken.js';
 
-export { Add };
+export { MathToken };

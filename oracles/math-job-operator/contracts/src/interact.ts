@@ -14,7 +14,7 @@
  */
 import { Mina, PrivateKey } from 'o1js';
 import fs from 'fs/promises';
-import { Add } from './Add.js';
+import { MathToken } from './MathToken.js';
 
 // check command line arg
 let deployAlias = process.argv[2];
@@ -58,12 +58,12 @@ const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 Mina.setActiveInstance(Network);
 let feepayerAddress = feepayerKey.toPublicKey();
 let zkAppAddress = zkAppKey.toPublicKey();
-let zkApp = new Add(zkAppAddress);
+let zkApp = new MathToken(zkAppAddress);
 
 let sentTx;
 // compile the contract to create prover keys
 console.log('compile the contract...');
-await Add.compile();
+await MathToken.compile();
 try {
   // call update() and send transaction
   console.log('build transaction and create proof...');
