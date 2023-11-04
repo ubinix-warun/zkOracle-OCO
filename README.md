@@ -12,6 +12,7 @@ the zkApps Hackathon & Grant -- [Mina Navigators Program](https://minaprotocol.c
     * [oracles/price-feed-operator/fetcher](oracles/price-feed-operator/fetcher)
     * [oracles/price-feed-operator/signer](oracles/price-feed-operator/signer)
 - Milestone 2: Develop unit tests for the domain model to ensure each component works as intended.
+    * [MathToken.test.ts](oracles/math-job-operator/contracts/src/MathToken.test.ts)
     * [FeedTokenContract.test.ts](oracles/price-feed-operator/contracts/src/FeedTokenContract.test.ts)
 - Milestone 3: Extend the domain model to integrate it with existing projects or utilize it for a new idea. This will involve actual coding and integration tasks.
     * [zkOracle-OFW](https://github.com/ubinix-warun/zkOracle-OCW)
