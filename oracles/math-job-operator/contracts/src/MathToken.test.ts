@@ -1,21 +1,8 @@
-import { MathToken } from './MathToken';
+import { MathToken, ZkAppB } from './MathToken';
 import { Field, Mina, 
   TokenId, UInt64,
   PrivateKey, PublicKey, AccountUpdate, 
   SmartContract, method } from 'o1js';
-
-/*
- * This file specifies how to test the `Add` example smart contract. It is safe to delete this file and replace
- * with your own tests.
- *
- * See https://docs.minaprotocol.com/zkapps for more info.
- */
-
-class ZkAppB extends SmartContract {
-  @method approveZkapp(amount: UInt64) {
-    this.balance.subInPlace(amount);
-  }
-}
 
 let proofsEnabled = false;
 
@@ -136,7 +123,7 @@ describe('MathToken', () => {
           await Mina.transaction({ sender: feePayer }, () => {
             AccountUpdate.fundNewAccount(feePayer);
             tokenZkapp.mint(zkAppBAddress, UInt64.from(100_000));
-            // tokenZkapp.requireSignature();
+            tokenZkapp.requireSignature();
           })
         )
           .sign([feePayerKey, tokenZkappKey])
