@@ -1,4 +1,6 @@
-import { Field, SmartContract, state, State, method } from 'o1js';
+import { Field, SmartContract, VerificationKey,
+    PublicKey, UInt64, AccountUpdate, Permissions,
+    state, State, method } from 'o1js';
 
 /**
  * Basic Example
@@ -10,16 +12,40 @@ import { Field, SmartContract, state, State, method } from 'o1js';
  * This file is safe to delete and replace with your own contract.
  */
 export class MathToken extends SmartContract {
-  @state(Field) num = State<Field>();
+
+  SUPPLY = UInt64.from(10n ** 18n);
+  @state(UInt64) totalAmountInCirculation = State<UInt64>();
+
+    /**
+   * This deploy method lets a another token account deploy their zkApp and verification key as a child of this token contract.
+   * This is important since we want the native token id of the deployed zkApp to be the token id of the token contract.
+   */
+    @method deployZkapp(address: PublicKey, verificationKey: VerificationKey) {
+      let tokenId = this.token.id;
+      let zkapp = AccountUpdate.defaultAccountUpdate(address, tokenId);
+      this.approve(zkapp);
+      zkapp.account.permissions.set(Permissions.default());
+      zkapp.account.verificationKey.set(verificationKey);
+      zkapp.requireSignature();
+    }
 
   init() {
     super.init();
-    this.num.set(Field(1));
   }
 
-  @method update() {
-    const currentState = this.num.getAndAssertEquals();
-    const newState = currentState.add(2);
-    this.num.set(newState);
+  @method mint(receiverAddress: PublicKey, amount: UInt64) {
+    let totalAmountInCirculation = this.totalAmountInCirculation.get();
+    this.totalAmountInCirculation.assertEquals(totalAmountInCirculation);
+    let newTotalAmountInCirculation = totalAmountInCirculation.add(amount);
+    newTotalAmountInCirculation.value.assertLessThanOrEqual(
+      this.SUPPLY.value,
+      "Can't mint more than the total supply"
+    );
+    this.token.mint({
+      address: receiverAddress,
+      amount,
+    });
+    this.totalAmountInCirculation.set(newTotalAmountInCirculation);
   }
+
 }
