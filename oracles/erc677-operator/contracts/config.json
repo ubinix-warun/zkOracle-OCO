@@ -1,4 +1,22 @@
 {
   "version": 1,
-  "deployAliases": {}
+  "deployAliases": {
+    "berkeley": {
+      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
+      "keyPath": "keys/berkeley.json",
+      "feepayerKeyPath": "keys/berkeley-erc20.json",
+      "feepayerAlias": "berkeley-erc20",
+      "fee": "0.1",
+      "archive": "https://api.minascan.io/archive/berkeley/v1/graphql"
+    },
+    "testworld": {
+      "url": "https://proxy.testworld.minaexplorer.com/graphql",
+      "keyPath": "keys/testworld.json",
+      "feepayerKeyPath": "keys/testworld-erc20.json",
+      "feepayerAlias": "testworld",
+      "fee": "0.1",
+      "archive": "https://api.minascan.io/archive/testworld/v1/graphql/",
+      "smartContract": "Erc20Contract"
+    }
+  }
 }

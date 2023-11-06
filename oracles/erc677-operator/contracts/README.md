@@ -21,6 +21,9 @@ pnpm run testw # watch mode
 pnpm run coverage
 ```
 
+https://proxy.berkeley.minaexplorer.com/graphql
+https://proxy.testworld.minaexplorer.com/graphql
+
 ## FYI
 
 ```sh

@@ -13,8 +13,8 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey } from 'o1js';
-import { Add } from './Add.js';
+import { AccountUpdate, Mina, PrivateKey } from 'o1js';
+import { Erc20Contract } from './Erc20Contract.js';
 
 // check command line arg
 let deployAlias = process.argv[2];
@@ -58,33 +58,46 @@ const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 Mina.setActiveInstance(Network);
 let feepayerAddress = feepayerKey.toPublicKey();
 let zkAppAddress = zkAppKey.toPublicKey();
-let zkApp = new Add(zkAppAddress);
+let zkApp = new Erc20Contract(zkAppAddress);
 
 let sentTx;
 // compile the contract to create prover keys
 console.log('compile the contract...');
-await Add.compile();
+await Erc20Contract.compile();
+
+let personA = PrivateKey.fromBase58("EKEH6rMNoKeEBCjupw6zhx4drYA4LP8J3Eq4ipZBLTSM66gdRbqF");
+
 try {
-  // call update() and send transaction
+// call update() and send transaction
   console.log('build transaction and create proof...');
   let tx = await Mina.transaction({ sender: feepayerAddress, fee }, () => {
-    zkApp.update();
+    
+    let feePayerUpdate = AccountUpdate.fundNewAccount(feepayerAddress, 3);
+    feePayerUpdate.send({
+      to: personA.toPublicKey(),
+      amount: Mina.accountCreationFee(),
+    });
+    
   });
   await tx.prove();
   console.log('send transaction...');
-  sentTx = await tx.sign([feepayerKey]).send();
+  sentTx = await tx.sign([feepayerKey, zkAppKey]).send();
 } catch (err) {
   console.log(err);
 }
+
 if (sentTx?.hash() !== undefined) {
   console.log(`
-Success! Update transaction sent.
+  Success! Deploy ERC20 transaction sent.
 
-Your smart contract state will be updated
-as soon as the transaction is included in a block:
-${getTxnUrl(config.url, sentTx.hash())}
-`);
+  Your smart contract state will be updated
+  as soon as the transaction is included in a block:
+    ${getTxnUrl(config.url, sentTx.hash())}
+  `);
 }
+
+console.log(" personA = ", Mina.getBalance(personA.toPublicKey(), zkApp.tokenId).value.toBigInt());
+
 
 function getTxnUrl(graphQlUrl: string, txnHash: string | undefined) {
   const txnBroadcastServiceName = new URL(graphQlUrl).hostname
