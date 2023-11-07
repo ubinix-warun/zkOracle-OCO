@@ -14,7 +14,8 @@ import {
 // Credit: https://github.com/o1-labs/o1js/blob/a73937d4a1870cfab51c525b5246e1e2f2b9207f/src/lib/token.test.ts
 
 // import { TokenContract } from './TokenContract';
-import { Erc20Contract } from './Erc20Contract';
+// import { Erc20Contract } from './Erc20Contract';
+import { Erc677Contract } from './Erc677Contract';
   
 export const tokenSymbol = 'TOKEN';
 
@@ -41,7 +42,8 @@ let feePayer: PublicKey;
 let tokenZkappKey: PrivateKey;
 let tokenZkappAddress: PublicKey;
 // let tokenZkapp: TokenContract;
-let tokenZkapp: Erc20Contract;
+// let tokenZkapp: Erc20Contract;
+let tokenZkapp: Erc677Contract;
 let tokenId: Field;
 
 let zkAppBKey: PrivateKey;
@@ -65,7 +67,8 @@ function setupAccounts() {
   tokenZkappAddress = tokenZkappKey.toPublicKey();
 
   // tokenZkapp = new TokenContract(tokenZkappAddress);
-  tokenZkapp = new Erc20Contract(tokenZkappAddress);
+  // tokenZkapp = new Erc20Contract(tokenZkappAddress);
+  tokenZkapp = new Erc677Contract(tokenZkappAddress);
   tokenId = tokenZkapp.token.id;
 
   zkAppBKey = Local.testAccounts[1].privateKey;
@@ -113,15 +116,15 @@ async function setupLocalProofs() {
   Local.setProofsEnabled(true);
 }
 
-describe('Token (Erc20)', () => {
+describe('Token (Erc677)', () => {
   beforeAll(async () => {
     // await TokenContract.compile();
-    await Erc20Contract.compile();
+    await Erc677Contract.compile();
     await ZkAppB.compile();
     await ZkAppC.compile();
   });
 
-  describe('Signature Authorization', () => {
+  describe('Signature Authorization (Based on Erc20)', () => {
     /*
       test case description:
       Check token contract can be deployed and initialized
@@ -344,7 +347,7 @@ describe('Token (Erc20)', () => {
     });
   });
 
-  describe('Proof Authorization', () => {
+  describe('Proof Authorization (Based on Erc20)', () => {
     /*
       test case description:
       Check token contract can be deployed and initialized with proofs
@@ -513,5 +516,5 @@ describe('Token (Erc20)', () => {
       });
     });
   });
-  
+
 });

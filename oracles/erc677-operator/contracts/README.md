@@ -1,4 +1,4 @@
-# Mina zkApp: erc677 operator
+# Mina zkApp: oracle/erc677-operator
 
 This template uses TypeScript.
 
@@ -21,15 +21,20 @@ pnpm run testw # watch mode
 pnpm run coverage
 ```
 
-https://proxy.berkeley.minaexplorer.com/graphql
-https://proxy.testworld.minaexplorer.com/graphql
-
 ## FYI
 
 ```sh
 
 pnpm install husky -D
 pnpm install @types/node -D
+
+```
+
+```
+
+https://proxy.berkeley.minaexplorer.com/graphql
+https://proxy.testworld.minaexplorer.com/graphql
+
 ```
 
 ## License

@@ -5,7 +5,6 @@ import {
     PublicKey,
     SmartContract,
     UInt64,
-    FlexibleProvablePure,
     ProvablePure,
     provablePure,
     Account,
@@ -27,7 +26,7 @@ import {
    * ERC-20 token standard.
    * https://ethereum.org/en/developers/docs/standards/tokens/erc-20/
    */
-type Erc20 = {
+export type Erc20 = {
     // pure view functions which don't need @method
     name?: () => CircuitString;
     symbol?: () => CircuitString;

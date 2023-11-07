@@ -7,13 +7,11 @@ the zkApps Hackathon & Grant -- [Mina Navigators Program](https://minaprotocol.c
 - Milestone 0: Design a domain model.
     * [ERC677](https://github.com/ethereum/EIPs/issues/677)
 - Milestone 1: Create a domain model (almost an SDK with Structs, Programs, Contracts, etc.) with o1js that articulates your project's foundations.
-    * [oracles/math-job-operator](oracles/math-job-operator)  
-    * [oracles/price-feed-operator](oracles/price-feed-operator)  
-    * [oracles/price-feed-operator/fetcher](oracles/price-feed-operator/fetcher)
-    * [oracles/price-feed-operator/signer](oracles/price-feed-operator/signer)
+    * [oracle/erc677-operator](oracles/erc677-operator)  
+    * [archived/scripts/math-job-operator](archived/scripts/math-job-operator)  
+    * [archived/scripts/price-feed-operator](archived/scripts/price-feed-operator)
 - Milestone 2: Develop unit tests for the domain model to ensure each component works as intended.
-    * [MathToken.test.ts](oracles/math-job-operator/contracts/src/MathToken.test.ts)
-    * [FeedTokenContract.test.ts](oracles/price-feed-operator/contracts/src/FeedTokenContract.test.ts)
+    * [token.test.ts](oracles/erc677-operator/contracts/src/token.test.ts)
 - Milestone 3: Extend the domain model to integrate it with existing projects or utilize it for a new idea. This will involve actual coding and integration tasks.
     * [zkOracle-OFW](https://github.com/ubinix-warun/zkOracle-OCW)
 - Milestone 4: Draft comprehensive documentation. Start with the README in the main repository, then move to more detailed docs using frameworks like NextJS. Make sure you provide a clear overview, diagrams, a getting started guide, and explain the relevance of "why Mina.”
