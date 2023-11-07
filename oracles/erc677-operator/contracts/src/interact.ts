@@ -13,7 +13,7 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { AccountUpdate, Mina, PrivateKey } from 'o1js';
+import { AccountUpdate, Mina, PrivateKey, UInt64 } from 'o1js';
 import { Erc20Contract } from './Erc20Contract.js';
 
 // check command line arg
@@ -36,6 +36,7 @@ type Config = {
       fee: string;
       feepayerKeyPath: string;
       feepayerAlias: string;
+      archive: string;
     }
   >;
 };
@@ -53,9 +54,13 @@ let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
 let zkAppKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
 
 // set up Mina instance and contract we interact with
-const Network = Mina.Network(config.url);
+const Network = Mina.Network({
+  mina:config.url,
+  archive:config.archive
+});
 const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 Mina.setActiveInstance(Network);
+
 let feepayerAddress = feepayerKey.toPublicKey();
 let zkAppAddress = zkAppKey.toPublicKey();
 let zkApp = new Erc20Contract(zkAppAddress);
@@ -65,38 +70,73 @@ let sentTx;
 console.log('compile the contract...');
 await Erc20Contract.compile();
 
+const name = await zkApp.name().toString();
+const symbol = await zkApp.symbol().toString();
+const totalSupply = await zkApp.totalSupply().toBigInt();
+
+console.log(`${name} (${symbol}): ${totalSupply}`);
+
+// PublicKey: B62qpRrf3s3vyRTvWkCo3Nfq87JPZ3WoRqBvBD8eNGzQmxW7vs5E7MV
 let personA = PrivateKey.fromBase58("EKEH6rMNoKeEBCjupw6zhx4drYA4LP8J3Eq4ipZBLTSM66gdRbqF");
+console.log(`- ${personA.toPublicKey().toBase58()} ${zkApp.balanceOf(feepayerAddress)}`);
 
-try {
-// call update() and send transaction
-  console.log('build transaction and create proof...');
-  let tx = await Mina.transaction({ sender: feepayerAddress, fee }, () => {
+// try {
+// // call update() and send transaction
+//   console.log('build transaction and create proof...');
+//   let tx = await Mina.transaction({ sender: feepayerAddress, fee }, () => {
     
-    let feePayerUpdate = AccountUpdate.fundNewAccount(feepayerAddress, 3);
-    feePayerUpdate.send({
-      to: personA.toPublicKey(),
-      amount: Mina.accountCreationFee(),
-    });
+//     zkApp.mint(personA.toPublicKey(), UInt64.from(100_000));
+//     zkApp.requireSignature();
+
+//     // let feePayerUpdate = AccountUpdate.fundNewAccount(feepayerAddress);
+//     // feePayerUpdate.send({
+//     //   to: personA.toPublicKey(),
+//     //   amount: 10,
+//     // });
+//     // zkApp.requireSignature();
     
-  });
-  await tx.prove();
-  console.log('send transaction...');
-  sentTx = await tx.sign([feepayerKey, zkAppKey]).send();
-} catch (err) {
-  console.log(err);
+//   });
+//   await tx.prove();
+//   console.log('send transaction...');
+//   sentTx = await tx.sign([feepayerKey, zkAppKey]).send();
+// } catch (err) {
+//   console.log(err);
+// }
+
+// if (sentTx?.hash() !== undefined) {
+//   console.log(`
+//   Success! Deploy ERC20 transaction sent.
+
+//   Your smart contract state will be updated
+//   as soon as the transaction is included in a block:
+//     ${getTxnUrl(config.url, sentTx.hash())}
+//   `);
+// }
+
+// console.log(" = ", Mina.getBalance(personA.toPublicKey()).toBigInt().valueOf());
+
+
+// zkApp state update
+console.log('Trying to update deployed zkApp state.');
+sentTx = await Mina.transaction({ sender: feepayerAddress, fee: 1e9 }, () => {
+  
+  zkApp.mint(personA.toPublicKey(), UInt64.from(100_000));
+  zkApp.requireSignature();
+});
+await sentTx.sign([feepayerKey, zkAppKey]).prove();
+console.log('Sending the transaction.');
+let pendingTx = await sentTx.send();
+
+if (pendingTx.hash() !== undefined) {
+  console.log(`Success! Update transaction sent.
+Your smart contract state will be updated
+as soon as the transaction is included in a block.
+Txn hash: ${pendingTx.hash()}`);
 }
+console.log('Waiting for transaction inclusion in a block.');
+await pendingTx.wait({ maxAttempts: 90 });
 
-if (sentTx?.hash() !== undefined) {
-  console.log(`
-  Success! Deploy ERC20 transaction sent.
-
-  Your smart contract state will be updated
-  as soon as the transaction is included in a block:
-    ${getTxnUrl(config.url, sentTx.hash())}
-  `);
-}
-
-console.log(" personA = ", Mina.getBalance(personA.toPublicKey(), zkApp.tokenId).value.toBigInt());
+// console.log(" personA = ", Mina.getBalance(personA.toPublicKey(), zkApp.tokenId).value.toBigInt());
 
 
 function getTxnUrl(graphQlUrl: string, txnHash: string | undefined) {

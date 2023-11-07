@@ -19,8 +19,8 @@ jobs:
         uses: actions/checkout@v2
       - name: NPM ci, build, & test
         run: |
-          npm install
-          npm run build --if-present
-          npm test
+          pnpm install
+          pnpm run build --if-present
+          pnpm test
         env:
           CI: true
