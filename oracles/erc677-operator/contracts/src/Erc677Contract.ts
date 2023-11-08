@@ -41,6 +41,10 @@ export type Erc677 = Erc20 & {
 };
 
 
+export class Erc677Receiver extends SmartContract {
+
+}
+
 export class Erc677Contract extends SmartContract implements Erc677 {
 
   SUPPLY = UInt64.from(10n ** 18n);
@@ -195,8 +199,13 @@ export class Erc677Contract extends SmartContract implements Erc677 {
   }
 
   @method transferAndCall(to: PublicKey, value: UInt64, data: CircuitString): Bool {
-    // throw new Error('Method not implemented.');
-    return Bool(true);
+      this.token.send({ from: this.sender, to, amount: value });
+      this.emitEvent('TransferAndCall', { from: this.sender, to, value, data });
+      // isContract()
+        // const calledContract = new Erc677Receiver(this.sender);
+        
+      // we don't have to check the balance of the sender -- this is done by the zkApp protocol
+      return Bool(true);
   }
 
   @method transfer(to: PublicKey, value: UInt64): Bool {

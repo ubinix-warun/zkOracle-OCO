@@ -116,7 +116,7 @@ async function setupLocalProofs() {
   Local.setProofsEnabled(true);
 }
 
-describe('Token (Erc677)', () => {
+describe('Token (Erc20)', () => {
   beforeAll(async () => {
     // await TokenContract.compile();
     await Erc677Contract.compile();
@@ -124,7 +124,7 @@ describe('Token (Erc677)', () => {
     await ZkAppC.compile();
   });
 
-  describe('Signature Authorization (Based on Erc20)', () => {
+  describe('Signature Authorization', () => {
     /*
       test case description:
       Check token contract can be deployed and initialized
@@ -347,7 +347,7 @@ describe('Token (Erc677)', () => {
     });
   });
 
-  describe('Proof Authorization (Based on Erc20)', () => {
+  describe('Proof Authorization', () => {
     /*
       test case description:
       Check token contract can be deployed and initialized with proofs
