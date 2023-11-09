@@ -19,6 +19,7 @@ import {
 } from 'o1js';
 
 import { Erc20 } from './Erc20Contract'
+import { OracleContract } from './OracleContract';
   
   /**
    * ERC-677 token standard.
@@ -40,10 +41,6 @@ export type Erc677 = Erc20 & {
 
 };
 
-
-export class Erc677Receiver extends SmartContract {
-
-}
 
 export class Erc677Contract extends SmartContract implements Erc677 {
 
@@ -201,8 +198,9 @@ export class Erc677Contract extends SmartContract implements Erc677 {
   @method transferAndCall(to: PublicKey, value: UInt64, data: CircuitString): Bool {
       this.token.send({ from: this.sender, to, amount: value });
       this.emitEvent('TransferAndCall', { from: this.sender, to, value, data });
-      // isContract()
-        // const calledContract = new Erc677Receiver(this.sender);
+      
+    //   const oracleContract = new OracleContract(to);
+    //   oracleContract.onTokenTransfer(this.sender, value, data);
         
       // we don't have to check the balance of the sender -- this is done by the zkApp protocol
       return Bool(true);

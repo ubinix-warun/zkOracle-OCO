@@ -18,6 +18,7 @@ import {
 // import { TokenContract } from './TokenContract';
 // import { Erc20Contract } from './Erc20Contract';
 import { Erc677Contract } from './Erc677Contract';
+import { OracleContract } from './OracleContract';
   
 export const tokenSymbol = 'TOKEN';
 
@@ -56,6 +57,10 @@ let zkAppCKey: PrivateKey;
 let zkAppCAddress: PublicKey;
 let zkAppC: ZkAppC;
 
+let zkOracleKey: PrivateKey;
+let zkOracleAddress: PublicKey;
+let zkOracle: OracleContract;
+
 function setupAccounts() {
   let Local = Mina.LocalBlockchain({
     proofsEnabled: true,
@@ -80,6 +85,10 @@ function setupAccounts() {
   zkAppCKey = Local.testAccounts[2].privateKey;
   zkAppCAddress = zkAppCKey.toPublicKey();
   zkAppC = new ZkAppC(zkAppCAddress, tokenId);
+
+  zkOracleKey = Local.testAccounts[3].privateKey;
+  zkOracleAddress = zkOracleKey.toPublicKey();
+  zkOracle = new OracleContract(zkOracleAddress, tokenId);
   return Local;
 }
 
@@ -95,6 +104,18 @@ async function setupLocal() {
   });
   tx.sign([tokenZkappKey, feePayerKey]);
   await tx.send();
+
+  // let tx2 = await Mina.transaction(feePayer, () => {
+  //   let feePayerUpdate = AccountUpdate.fundNewAccount(feePayer);
+  //   feePayerUpdate.send({
+  //     to: zkOracleAddress,
+  //     amount: Mina.accountCreationFee(),
+  //   });
+  //   zkOracle.deploy();
+  // });
+  // tx2.sign([zkOracleKey, feePayerKey]);
+  // await tx2.send();
+
 }
 
 async function setupLocalProofs() {
@@ -124,6 +145,7 @@ describe('Token (Erc677)', () => {
     await Erc677Contract.compile();
     await ZkAppB.compile();
     await ZkAppC.compile();
+    await OracleContract.compile();
   });
 
   describe('Signature Authorization ', () => {
@@ -214,25 +236,23 @@ describe('Token (Erc677)', () => {
           let tx = await Mina.transaction(zkAppBAddress, () => {
             AccountUpdate.fundNewAccount(zkAppBAddress);
             tokenZkapp.transferAndCall(
-              zkAppCAddress,
+              zkOracleAddress,
               UInt64.from(10_000),
               CircuitString.fromString('REQUEST')
             ); // .token.send
             tokenZkapp.requireSignature();
           });
-          tx.sign([zkAppBKey, zkAppCKey, feePayerKey, tokenZkappKey]);
+          tx.sign([zkAppBKey, zkOracleKey, feePayerKey, tokenZkappKey]);
           await tx.send();
   
           const events = await tokenZkapp.fetchEvents(UInt32.from(0));
           expect(events[0].type).toEqual('TransferAndCall');
 
-          console.log(events[0].event.data);
-
           expect(
             Mina.getBalance(zkAppBAddress, tokenId).value.toBigInt()
           ).toEqual(190_000n);
           expect(
-            Mina.getBalance(zkAppCAddress, tokenId).value.toBigInt()
+            Mina.getBalance(zkOracleAddress, tokenId).value.toBigInt()
           ).toEqual(10_000n);
         });
 

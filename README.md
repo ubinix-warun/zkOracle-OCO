@@ -9,7 +9,7 @@
 
 ## What is OCO?
 
-In the realm of blockchain technology, an off-chain operator (OCO) is an entity that performs actions or computations outside of the blockchain network. 
+Off-chain operator (OCO) is an entity that performs actions or computations outside of the blockchain network. 
 
 The integration of OCOs into the Mina Protocol ecosystem represents a significant step forward in enhancing the protocol's efficiency, scalability, and privacy capabilities. By offloading, Mina Protocol can streamline its operations and reduce its reliance on on-chain resources.
 
@@ -28,5 +28,6 @@ For information on how to make technical and non-technical contributions, see th
 
 ## Community
 
-## License
+[Apache 2.0](LICENSE)
 
+Commits older than 2023-11-09 do not have a [LICENSE](LICENSE) file or this notice, but are distributed under the same terms.
