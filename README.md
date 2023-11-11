@@ -24,7 +24,7 @@ For information on how to make technical and non-technical contributions, see th
 
 ### Quick Links
 
-- [Milestone ‐‐ MINA Navigators (Oct 2023)](../../wiki/Milestone-%E2%80%90%E2%80%90-MINA-Navigators-(Oct-2023))
+- [Milestone ‐‐ MINA Navigators (Oct 2023)](../../wiki/MINA-Navigators-(Oct-2023))
 
 ## Community
 
