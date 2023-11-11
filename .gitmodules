@@ -1,3 +1,6 @@
 [submodule "docs/wiki"]
 	path = docs/wiki
 	url = https://github.com/ubinix-warun/zkOracle-OCO.wiki.git
+[submodule "oracles/mina-price-ocw"]
+	path = oracles/mina-price-ocw
+	url = https://github.com/ubinix-warun/zkOracle-OCW.git
