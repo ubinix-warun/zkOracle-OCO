@@ -2,9 +2,9 @@
 
 ### Build status
 
-| Develop | Berkeley | Compatible | 
-| ------- | -------- | ---------- |
-| [![Build status - develop]()]() | [![Build status - berkeley]()]() | [![Build status - compatible]()]()
+| Develop | Berkeley | 
+| ------- | -------- |
+| [![Build status - develop]()]() | [![Build status - berkeley]()]() | 
 
 
 ## What is OCO?
@@ -15,6 +15,8 @@ The integration of OCOs into the Mina Protocol ecosystem represents a significan
 
 
 ### OCO Walkthrough
+
+
 
 ## Contributing
 
@@ -27,6 +29,10 @@ For information on how to make technical and non-technical contributions, see th
 - [Milestone ‐‐ MINA Navigators (Oct 2023)](../../wiki/Milestone-%E2%80%90%E2%80%90-MINA-Navigators-(Oct-2023))
 
 ## Community
+
+
+
+## License
 
 [Apache 2.0](LICENSE)
 
