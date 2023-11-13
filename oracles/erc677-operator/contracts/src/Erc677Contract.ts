@@ -74,8 +74,8 @@ export class Erc677Contract extends SmartContract implements Erc677 {
       // pay fees for opened account
       this.balance.subInPlace(Mina.accountCreationFee());
 
-    //   this.totalAmountInCirculation.set(this.SUPPLY.sub(100_000_000));
-      this.totalAmountInCirculation.set(UInt64.from(10n ** 18n));
+      this.totalAmountInCirculation.set(this.SUPPLY.sub(100_000_000));
+    //   this.totalAmountInCirculation.set(UInt64.from(10n ** 18n));
 
       // since this is the only method of this zkApp that resets the entire state, provedState: true implies
       // that this function was run. Since it can be run only once, this implies it was run exactly once
