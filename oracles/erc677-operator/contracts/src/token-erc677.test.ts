@@ -150,6 +150,43 @@ describe('Token (Erc677)', () => {
 
   describe('Signature Authorization ', () => {
 
+    /*
+      test case description:
+      Check token contract can be deployed and initialized
+      tested cases:
+        - create a new token
+        - deploy a zkApp under a custom token
+        - create a new valid token with a different parentTokenId
+        - set the token symbol after deployment
+    */
+    describe('Token Contract Creation/Deployment', () => {
+      beforeEach(async () => {
+        await setupLocal();
+      });
+
+      test('correct token id can be derived with an existing token owner', () => {
+        expect(tokenId).toEqual(TokenId.derive(tokenZkappAddress));
+      });
+
+      test('deployed token contract exists in the ledger', () => {
+        expect(Mina.getAccount(tokenZkappAddress, tokenId)).toBeDefined();
+      });
+
+      test('setting a valid token symbol on a token contract', async () => {
+        await (
+          await Mina.transaction({ sender: feePayer }, () => {
+            let tokenZkapp = AccountUpdate.createSigned(tokenZkappAddress);
+            tokenZkapp.account.tokenSymbol.set(tokenSymbol);
+          })
+        )
+          .sign([feePayerKey, tokenZkappKey])
+          .send();
+        const symbol = Mina.getAccount(tokenZkappAddress).tokenSymbol;
+        expect(tokenSymbol).toBeDefined();
+        expect(symbol).toEqual(tokenSymbol);
+      });
+    });
+    
     describe('Transfer', () => {
         beforeEach(async () => {
           await setupLocal();
