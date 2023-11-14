@@ -17,7 +17,7 @@ import {
 
 import { OracleContract } from './OracleContract';
   
-export const tokenSymbol = 'TOKEN';
+export const oracleSymbol = 'TOKEN';
 
 class ZkAppB extends SmartContract {
   @method approveZkapp(amount: UInt64) {
@@ -73,11 +73,11 @@ function setupAccounts() {
 
   zkAppBKey = Local.testAccounts[1].privateKey;
   zkAppBAddress = zkAppBKey.toPublicKey();
-  // zkAppB = new ZkAppB(zkAppBAddress, tokenId);
+  zkAppB = new ZkAppB(zkAppBAddress, oracleId);
 
   zkAppCKey = Local.testAccounts[2].privateKey;
   zkAppCAddress = zkAppCKey.toPublicKey();
-  // zkAppC = new ZkAppC(zkAppCAddress, tokenId);
+  zkAppC = new ZkAppC(zkAppCAddress, oracleId);
 
   return Local;
 }
@@ -110,7 +110,7 @@ async function setupLocal() {
 
 async function setupLocalProofs() {
   let Local = setupAccounts();
-  // zkAppC = new ZkAppC(zkAppCAddress, tokenId);
+  zkAppC = new ZkAppC(zkAppCAddress, oracleId);
   // don't use proofs for the setup, takes too long to do this every time
   Local.setProofsEnabled(false);
   let tx = await Mina.transaction({ sender: feePayer }, () => {
@@ -120,10 +120,11 @@ async function setupLocalProofs() {
       amount: Mina.accountCreationFee(),
     });
     oracleZkapp.deploy();
-    // tokenZkapp.deployZkapp(zkAppBAddress, ZkAppB._verificationKey!);
-    // tokenZkapp.deployZkapp(zkAppCAddress, ZkAppC._verificationKey!);
+    oracleZkapp.deployZkapp(zkAppBAddress, ZkAppB._verificationKey!);
+    oracleZkapp.deployZkapp(zkAppCAddress, ZkAppC._verificationKey!);
   });
   await tx.prove();
+  // tx.sign([oracleZkappKey, feePayerKey]);
   tx.sign([oracleZkappKey, zkAppBKey, zkAppCKey, feePayerKey]);
   await tx.send();
   Local.setProofsEnabled(true);
@@ -131,7 +132,6 @@ async function setupLocalProofs() {
 
 describe('Oracle', () => {
   beforeAll(async () => {
-    // await TokenContract.compile();
     await OracleContract.compile();
     await ZkAppB.compile();
     await ZkAppC.compile();
@@ -148,32 +148,32 @@ describe('Oracle', () => {
         - create a new valid token with a different parentTokenId
         - set the token symbol after deployment
     */
-    describe('Token Contract Creation/Deployment', () => {
+    describe('Oracle Contract Creation/Deployment', () => {
       beforeEach(async () => {
         await setupLocal();
       });
 
-      test('correct oracle id can be derived with an existing token owner', () => {
+      test('correct oracle id can be derived with an existing oracle owner', () => {
         expect(oracleId).toEqual(TokenId.derive(oracleZkappAddress));
       });
 
-      test('deployed token contract exists in the ledger', () => {
-        expect(Mina.getAccount(oracleZkappAddress, oracleId)).toBeDefined();
-      });
-
-      // test('setting a valid token symbol on a token contract', async () => {
-      //   await (
-      //     await Mina.transaction({ sender: feePayer }, () => {
-      //       let oracleZkapp = AccountUpdate.createSigned(oracleZkappAddress);
-      //       oracleZkapp.account.tokenSymbol.set(tokenSymbol);
-      //     })
-      //   )
-      //     .sign([feePayerKey, oracleZkappKey])
-      //     .send();
-      //   const symbol = Mina.getAccount(oracleZkappAddress).tokenSymbol;
-      //   expect(tokenSymbol).toBeDefined();
-      //   expect(symbol).toEqual(tokenSymbol);
+      // test('deployed oracle contract exists in the ledger', () => {
+      //   expect(Mina.getAccount(oracleZkappAddress, oracleId)).toBeDefined();
       // });
+
+      test('setting a valid oracle symbol on a oracle contract', async () => {
+        await (
+          await Mina.transaction({ sender: feePayer }, () => {
+            let oracleZkapp = AccountUpdate.createSigned(oracleZkappAddress);
+            oracleZkapp.account.tokenSymbol.set(oracleSymbol);
+          })
+        )
+          .sign([feePayerKey, oracleZkappKey])
+          .send();
+        const symbol = Mina.getAccount(oracleZkappAddress).tokenSymbol;
+        expect(oracleSymbol).toBeDefined();
+        expect(symbol).toEqual(oracleSymbol);
+      });
     });
     
   });
