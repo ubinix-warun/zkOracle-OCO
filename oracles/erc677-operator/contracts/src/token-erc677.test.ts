@@ -279,6 +279,7 @@ describe('Token (Erc677)', () => {
             ); // .token.send
             tokenZkapp.requireSignature();
           });
+          await tx.prove();
           tx.sign([zkAppBKey, zkOracleKey, feePayerKey, tokenZkappKey]);
           await tx.send();
   
