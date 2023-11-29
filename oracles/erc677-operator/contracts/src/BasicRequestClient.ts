@@ -49,9 +49,9 @@ export class BasicRequestClient extends SmartContract implements OracleClient {
       super.init();
 
       // mint the entire supply to the token account with the same address as this contract
-      let address = this.address;
+      // let address = this.address;
       // pay fees for opened account
-      this.balance.subInPlace(Mina.accountCreationFee());
+      // this.balance.subInPlace(Mina.accountCreationFee());
 
       // since this is the only method of this zkApp that resets the entire state, provedState: true implies
       // that this function was run. Since it can be run only once, this implies it was run exactly once

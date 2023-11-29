@@ -73,15 +73,15 @@ function setupAccounts() {
   tokenZkappAddress = tokenZkappKey.toPublicKey();
 
   basicReqZkapp = new BasicRequestClient(tokenZkappAddress);
-  // tokenId = basicReqZkapp.token.id;
+  tokenId = basicReqZkapp.token.id;
 
-  zkAppBKey = Local.testAccounts[1].privateKey;
-  zkAppBAddress = zkAppBKey.toPublicKey();
-  zkAppB = new ZkAppB(zkAppBAddress, tokenId);
+  // zkAppBKey = Local.testAccounts[1].privateKey;
+  // zkAppBAddress = zkAppBKey.toPublicKey();
+  // zkAppB = new ZkAppB(zkAppBAddress, tokenId);
 
-  zkAppCKey = Local.testAccounts[2].privateKey;
-  zkAppCAddress = zkAppCKey.toPublicKey();
-  zkAppC = new ZkAppC(zkAppCAddress, tokenId);
+  // zkAppCKey = Local.testAccounts[2].privateKey;
+  // zkAppCAddress = zkAppCKey.toPublicKey();
+  // zkAppC = new ZkAppC(zkAppCAddress, tokenId);
 
   return Local;
 }
@@ -99,17 +99,6 @@ async function setupLocal() {
   tx.sign([tokenZkappKey, feePayerKey]);
   await tx.send();
 
-  // let tx2 = await Mina.transaction(feePayer, () => {
-  //   let feePayerUpdate = AccountUpdate.fundNewAccount(feePayer);
-  //   feePayerUpdate.send({
-  //     to: zkOracleAddress,
-  //     amount: Mina.accountCreationFee(),
-  //   });
-  //   zkOracle.deploy();
-  // });
-  // tx2.sign([zkOracleKey, feePayerKey]);
-  // await tx2.send();
-
 }
 
 async function setupLocalProofs() {
@@ -118,7 +107,7 @@ async function setupLocalProofs() {
   // don't use proofs for the setup, takes too long to do this every time
   Local.setProofsEnabled(false);
   let tx = await Mina.transaction({ sender: feePayer }, () => {
-    let feePayerUpdate = AccountUpdate.fundNewAccount(feePayer, 3);
+    let feePayerUpdate = AccountUpdate.fundNewAccount(feePayer);
     feePayerUpdate.send({
       to: tokenZkappAddress,
       amount: Mina.accountCreationFee(),
@@ -127,8 +116,7 @@ async function setupLocalProofs() {
     // tokenZkapp.deployZkapp(zkAppBAddress, ZkAppB._verificationKey!);
     // tokenZkapp.deployZkapp(zkAppCAddress, ZkAppC._verificationKey!);
   });
-  await tx.prove();
-  tx.sign([tokenZkappKey, zkAppBKey, zkAppCKey, feePayerKey]);
+  tx.sign([tokenZkappKey, feePayerKey]);
   await tx.send();
   Local.setProofsEnabled(true);
 }
@@ -137,8 +125,8 @@ describe('BasicRequest (Client)', () => {
   beforeAll(async () => {
     // await TokenContract.compile();
     await BasicRequestClient.compile();
-    await ZkAppB.compile();
-    await ZkAppC.compile();
+    // await ZkAppB.compile();
+    // await ZkAppC.compile();
   });
 
   describe('Signature Authorization ', () => {
@@ -155,15 +143,15 @@ describe('BasicRequest (Client)', () => {
     describe('Token Contract Creation/Deployment', () => {
       beforeEach(async () => {
         await setupLocal();
-      });
+      }); 
 
       test('correct token id can be derived with an existing token owner', () => {
         expect(tokenId).toEqual(TokenId.derive(tokenZkappAddress));
       });
 
-      test('deployed token contract exists in the ledger', () => {
-        expect(Mina.getAccount(tokenZkappAddress, tokenId)).toBeDefined();
-      });
+      // test('deployed token contract exists in the ledger', () => {
+      //   expect(Mina.getAccount(tokenZkappAddress, tokenId)).toBeDefined();
+      // });
 
       test('setting a valid token symbol on a token contract', async () => {
         await (

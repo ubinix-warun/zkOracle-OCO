@@ -85,7 +85,7 @@ import {
     });
     tx.sign([zkAppHwKey, zkAppOCKey, feePayerKey]);
     await tx.send();
-    console.log(`Deploy zkAppHw on ${zkAppHwAddress.toBase58()}`);
+    // console.log(`Deploy zkAppHw on ${zkAppHwAddress.toBase58()}`);
     // const updatedBalance = Mina.getBalance(zkAppHwAddress)
   }
   
