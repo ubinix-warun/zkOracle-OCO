@@ -19,6 +19,7 @@ jobs:
         uses: actions/checkout@v2
       - name: NPM ci, build, & test
         run: |
+          cd oracles/erc677-operator/contracts
           pnpm install
           pnpm run build --if-present
           pnpm test
