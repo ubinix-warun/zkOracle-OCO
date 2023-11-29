@@ -77,10 +77,16 @@ import {
         amount: Mina.accountCreationFee(),
       });
       zkAppHw.deploy();
+      feePayerUpdate.send({
+        to: zkAppOCAddress,
+        amount: Mina.accountCreationFee(),
+      });
+      zkAppOC.deploy();
     });
-    tx.sign([zkAppHwKey, feePayerKey]);
+    tx.sign([zkAppHwKey, zkAppOCKey, feePayerKey]);
     await tx.send();
     console.log(`Deploy zkAppHw on ${zkAppHwAddress.toBase58()}`);
+    // const updatedBalance = Mina.getBalance(zkAppHwAddress)
   }
   
   async function setupLocalProofs() {
@@ -118,23 +124,14 @@ import {
           await setupLocal();
         });
 
-        test(' the ledger (signature)', async () => {
+        test(' should be call myMethod from other contract (signature)', async () => {
           
-          let tx = await (
-            await Mina.transaction({ sender: feePayer }, () => {
-              AccountUpdate.fundNewAccount(feePayer);
-              zkAppHw.myMethod(zkAppOCAddress);
-              zkAppHw.requireSignature();
-            })
-          )
-
-          // await tx.prove();
-          await tx.sign([zkAppHwKey, feePayerKey])
-                    .send();
-  
-          // .sign([feePayerKey, zkAppHwKey])
-          //   .send();
-            
+          let tx = await Mina.transaction(feePayer, () => {
+            zkAppHw.myMethod(zkAppOCAddress);
+          });
+          await tx.prove();
+          await tx.sign([feePayerKey]).send();
+          
         });
 
       });
