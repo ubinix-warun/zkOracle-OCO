@@ -7,27 +7,27 @@
 name: CI
 on: [push, pull_request]
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - name: Set up NodeJS
-        uses: actions/setup-node@v2
-        with:
-          node-version: '16'
-      - name: Git checkout
-        uses: actions/checkout@v2
-      - name: NPM ci, build, & test
-        run: |
-          cd oracles/erc677-operator/contracts
-          npm install
-          npm run build --if-present
-          npm test
+  # test:
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 10
+  #   steps:
+  #     - name: Set up NodeJS
+  #       uses: actions/setup-node@v2
+  #       with:
+  #         node-version: '16'
+  #     - name: Git checkout
+  #       uses: actions/checkout@v2
+  #     - name: NPM ci, build, & test
+  #       run: |
+  #         cd oracles/erc677-operator/contracts
+  #         npm install
+  #         npm run build --if-present
+  #         npm test
 
-        env:
-          CI: true
+  #       env:
+  #         CI: true
            
-  coverage:
+  coverage-erc677:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -41,10 +41,15 @@ jobs:
         run: |
           cd oracles/erc677-operator/contracts
           npm install
-          npm run build --if-present
-          npm run coverage
-          npm i coverage-badges-cli -g
-          coverage-badges --output coverage/badges.svg
+          npm run coverage --if-present
+
+      - name: Create Coverage Badges
+        uses: jaywcjlove/coverage-badges-cli@main
+        with:
+          style: classic
+          source: oracles/erc677-operator/contracts/coverage/coverage-summary.json
+          output: oracles/erc677-operator/contracts/coverage/badges.svg
+          jsonPath: totals.percent_covered
 
       - name: Deploy Coverage
         uses: peaceiris/actions-gh-pages@v3
@@ -52,5 +57,6 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: oracles/erc677-operator/contracts/coverage
+
         env:
           CI: true
