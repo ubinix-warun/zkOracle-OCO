@@ -42,7 +42,7 @@ jobs:
           cd oracles/erc677-operator/contracts
           npm install
           npm run build --if-present
-          npm run 
+          npm run coverage
           npm i coverage-badges-cli -g
           coverage-badges --output coverage/badges.svg
 
