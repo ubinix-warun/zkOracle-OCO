@@ -48,7 +48,7 @@ jobs:
         uses: jaywcjlove/coverage-badges-cli@main
         with:
           style: classic
-          source: oracles/erc677-operator/contracts/coverage/coverage-final.json
+          source: oracles/erc677-operator/contracts/coverage/coverage-summary.json
           output: oracles/erc677-operator/contracts/coverage/badges.svg
           jsonPath: totals.percent_covered
 
