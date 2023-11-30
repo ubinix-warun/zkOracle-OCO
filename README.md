@@ -4,8 +4,7 @@
 
 | Develop | Berkeley | 
 | ------- | -------- |
-| [![CI](https://github.com/ubinix-warun/zkOracle-OCO/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ubinix-warun/zkOracle-OCO/actions/workflows/ci.yml) | [![Build status - berkeley]()]() | 
-
+| [![CI](https://github.com/ubinix-warun/zkOracle-OCO/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ubinix-warun/zkOracle-OCO/actions/workflows/ci.yml) ![Coverage](https://raw.githubusercontent.com/ubinix-warun/zkOracle-OCO/gh-pages/badges.svg)  | 🔥🔥🔥 | 
 
 ## What is OCO?
 
