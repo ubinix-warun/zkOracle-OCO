@@ -42,12 +42,13 @@ jobs:
           cd oracles/erc677-operator/contracts
           npm install
           npm run coverage --if-present
+          pwd
 
       - name: Create Coverage Badges
         uses: jaywcjlove/coverage-badges-cli@main
         with:
           style: classic
-          source: oracles/erc677-operator/contracts/coverage/coverage-summary.json
+          source: oracles/erc677-operator/contracts/coverage/coverage-final.json
           output: oracles/erc677-operator/contracts/coverage/badges.svg
           jsonPath: totals.percent_covered
 
