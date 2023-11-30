@@ -4,7 +4,7 @@
 
 | Develop | Berkeley | 
 | ------- | -------- |
-| [![CI](https://github.com/ubinix-warun/zkOracle-OCO/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ubinix-warun/zkOracle-OCO/actions/workflows/ci.yml) ![Coverage](https://raw.githubusercontent.com/ubinix-warun/zkOracle-OCO/gh-pages/badges.svg)  | 🔥🔥🔥 | 
+| [![CI](https://github.com/ubinix-warun/zkOracle-OCO/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ubinix-warun/zkOracle-OCO/actions/workflows/ci.yml)<br/>[![Coverage](https://raw.githubusercontent.com/ubinix-warun/zkOracle-OCO/gh-pages/badges.svg)](https://ubinix-warun.github.io/zkOracle-OCO/lcov-report)  | 🔥🔥🔥 | 
 
 ## What is OCO?
 
