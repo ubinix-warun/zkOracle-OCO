@@ -201,7 +201,7 @@ export class Erc677Contract extends SmartContract implements Erc677 {
       this.emitEvent('TransferAndCall', { from: this.sender, to, value, data });
       
       const oracleContract = new OracleContract(to);
-      // oracleContract.onTokenTransfer(this.sender, value, data);
+      oracleContract.onTokenTransfer(this.sender, value, data);
         
       // we don't have to check the balance of the sender -- this is done by the zkApp protocol
       return Bool(true);
