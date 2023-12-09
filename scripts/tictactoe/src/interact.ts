@@ -20,7 +20,7 @@ import {
   Lightnet,
 } from 'o1js';
 import { TicTacToe, Board } from './tictactoe.js';
-import { getTxnUrl, isFileExists } from './utils.js';
+import { deploy, getTxnUrl, isFileExists } from './utils.js';
 
 import fs from 'fs/promises';
 
@@ -29,8 +29,8 @@ const config = {
   mina: 'http://localhost:8080/graphql',
   archive: 'http://localhost:8282',
   lightnetAccountManager: 'http://localhost:8181',
+  fee: Number("0.1") * 1e9 // in nanomina (1 billion = 1.0 mina)
 };
-const fee = Number("0.1") * 1e9; // in nanomina (1 billion = 1.0 mina)
 
 const network = Mina.Network(config);
 Mina.setActiveInstance(network);
@@ -38,25 +38,29 @@ Mina.setActiveInstance(network);
 // Fee payer setup
 const feePayerPrivateKey = (await Lightnet.acquireKeyPair()).privateKey
 const feePayerAccount = feePayerPrivateKey.toPublicKey();
+console.log('Acquire feePayerPrivateKey ...');
 
-if (!(await isFileExists('tictactoe-zkApp.key'))) {
+// await fs.mkdir("keys");
+if (!(await isFileExists('keys/tictactoe-zkApp.key'))) {
   
-
   const zkAppPrivateKey = PrivateKey.random();
   const zkAppPublicKey = zkAppPrivateKey.toPublicKey();
 
-  await fs.writeFile('tictactoe-zkApp.key', JSON.stringify({
+  await fs.writeFile('keys/tictactoe-zkApp.key', JSON.stringify({
     privateKey: zkAppPrivateKey.toBase58(),
     publicKey: zkAppPublicKey
   }, null, 2))
+
+  console.log('Generate zkAppPrivateKey ...');
 
 }
 
 let zkAppKeysBase58: { privateKey: string; publicKey: string } = 
 JSON.parse(
-  await fs.readFile('tictactoe-zkApp.key', 'utf8')
+  await fs.readFile('keys/tictactoe-zkApp.key', 'utf8')
 );
 
+console.log('Load zkAppPrivateKey ...');
 
 const zkAppPrivateKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
 const zkAppPublicKey = zkAppPrivateKey.toPublicKey();
@@ -65,42 +69,25 @@ const zkApp = new TicTacToe(zkAppPublicKey);
 console.log('Compile the contract...');
 await TicTacToe.compile();
 
-// Create a new instance of the contract
-console.log('\n\n====== DEPLOYING ======\n\n');
-const sentTx = await Mina.transaction({ sender: feePayerAccount,fee: fee }, () => {
-  AccountUpdate.fundNewAccount(feePayerAccount);
-  zkApp.deploy();
-});
-console.log('Build transaction and create proof...');
-await sentTx.prove();
-/**
- * note: this tx needs to be signed with `tx.sign()`, because `deploy` uses `requireSignature()` under the hood,
- * so one of the account updates in this tx has to be authorized with a signature (vs proof).
- * this is necessary for the deploy tx because the initial permissions for all account fields are "signature".
- * (but `deploy()` changes some of those permissions to "proof" and adds the verification key that enables proofs.
- * that's why we don't need `tx.sign()` for the later transactions.)
- */
-console.log('Sending the transaction.');
-let pendingTx = await sentTx.sign([zkAppPrivateKey, feePayerPrivateKey]).send();
-
-if (pendingTx.hash() !== undefined) {
-    console.log(`Success! Update transaction sent.
-  Your smart contract state will be updated
-  as soon as the transaction is included in a block.
-  Txn hash: ${pendingTx.hash()}`);
+if(process.argv[2] === "deploy")
+{
+  await deploy(config, feePayerPrivateKey, zkAppPrivateKey, zkApp);
 }
+else if(process.argv[2] === "dumpstate") 
+{
+  await deploy(config, feePayerPrivateKey, zkAppPrivateKey, zkApp);
 
-console.log('Waiting for transaction inclusion in a block.');
-await pendingTx.wait({ maxAttempts: 90 });
-        
-if (pendingTx?.hash() !== undefined) {
-    console.log(`
-Success! Deploy TicTacToe transaction sent.
+  try {
+    console.log('initial state of the zkApp');
+    let zkAppState = Mina.getAccount(zkAppPublicKey);
 
-Your smart contract state will be updated
-as soon as the transaction is included in a block:
-${getTxnUrl(config.mina, pendingTx.hash())}
-`);
+    for (const i in [0, 1, 2, 3, 4, 5, 6, 7]) {
+      console.log('state', i, ':', zkAppState?.zkapp?.appState?.[i].toString());
+    }
+    
+  } catch (e) {
+    console.log(e);
+  }
 
 }
 
@@ -108,7 +95,9 @@ ${getTxnUrl(config.mina, pendingTx.hash())}
 const keyPairReleaseMessage = await Lightnet.releaseKeyPair({
   publicKey: feePayerAccount.toBase58(),
 });
+console.log('Release feePayerPrivateKey ...');
 if (keyPairReleaseMessage) console.log(keyPairReleaseMessage);
+
 
 // // initial state
 // let b = zkApp.board.get();
