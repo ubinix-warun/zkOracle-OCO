@@ -20,9 +20,9 @@ import {
   Lightnet,
 } from 'o1js';
 import { TicTacToe, Board } from './tictactoe.js';
-import { getTxnUrl } from './utils.js';
+import { getTxnUrl, isFileExists } from './utils.js';
 
-import fs from 'fs';
+import fs from 'fs/promises';
 
 // Network configuration
 const config = {
@@ -39,13 +39,26 @@ Mina.setActiveInstance(network);
 const feePayerPrivateKey = (await Lightnet.acquireKeyPair()).privateKey
 const feePayerAccount = feePayerPrivateKey.toPublicKey();
 
-if (fs.existsSync('tictactoe-zkApp.key')) {
-  // File exists in path
-} else {
-  // File doesn't exist in path
+if (!(await isFileExists('tictactoe-zkApp.key'))) {
+  
+
+  const zkAppPrivateKey = PrivateKey.random();
+  const zkAppPublicKey = zkAppPrivateKey.toPublicKey();
+
+  await fs.writeFile('tictactoe-zkApp.key', JSON.stringify({
+    privateKey: zkAppPrivateKey.toBase58(),
+    publicKey: zkAppPublicKey
+  }, null, 2))
+
 }
 
-const zkAppPrivateKey = PrivateKey.random();
+let zkAppKeysBase58: { privateKey: string; publicKey: string } = 
+JSON.parse(
+  await fs.readFile('tictactoe-zkApp.key', 'utf8')
+);
+
+
+const zkAppPrivateKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
 const zkAppPublicKey = zkAppPrivateKey.toPublicKey();
 const zkApp = new TicTacToe(zkAppPublicKey);
 
