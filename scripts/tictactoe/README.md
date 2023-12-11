@@ -4,7 +4,7 @@ Tic-tac-toe, a classic game of strategy and chance, can be enhanced with the fas
 
 The previously described Tic-Tac-Toe implementation can be further enhanced by running the mina node server in a local development environment using Lightnet.
 
-![Screenshot 2566-12-11 at 13 30 52](https://gist.github.com/assets/3756229/174497e1-6c33-4065-a9c6-7dafc6a8d7ba)
+<img src="https://github-production-user-asset-6210df.s3.amazonaws.com/3756229/289445176-174497e1-6c33-4065-a9c6-7dafc6a8d7ba.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20231211%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20231211T064035Z&X-Amz-Expires=300&X-Amz-Signature=49ac50729cb8aeb87dfff1f9d137a095d3033aa4357229a3e6e2582ecd1db198&X-Amz-SignedHeaders=host&actor_id=0&key_id=0&repo_id=0" >
 
 
 ## How to build
@@ -40,6 +40,9 @@ pnpm run lightnet:down
 
 <details>
   <summary>Console log "lightnet:play:demo" (FULL)</summary>
+  
+```bash
+
 Load feePayerPrivateKey ...
 Load zkAppPrivateKey ...
 Compile the contract ...
@@ -201,6 +204,8 @@ Release player1PayerAccount ...
 Account with public key B62qirS2J5KLtE7io98R2zdLpziR3GCC4paqeC1pYEPia17fKmceeu3 is set to be released.
 Release player2PayerAccount ...
 Account with public key B62qjMMMS4Q3Fqm45ZrakE6mQd7UiMZhP3NotH73PFpnSRVuam4MzFm is set to be released.
+```
+
 </details>
 
 ## License
