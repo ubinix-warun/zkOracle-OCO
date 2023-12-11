@@ -20,19 +20,21 @@ import {
   Lightnet,
 } from 'o1js';
 import { TicTacToe, Board } from './tictactoe.js';
-import { deploy, getTxnUrl, isFileExists } from './utils.js';
+import { deploy, fetchTest, fetchTest2, getTxnUrl, isFileExists } from './utils.js';
 
 import fs from 'fs/promises';
 
 // Network configuration
 const config = {
-  mina: 'http://localhost:8080/graphql',
-  archive: 'http://localhost:8282',
-  lightnetAccountManager: 'http://localhost:8181',
+  network: {
+    mina: 'http://localhost:8080/graphql',
+    archive: 'http://localhost:8282',
+    lightnetAccountManager: 'http://localhost:8181'
+  },
   fee: Number("0.1") * 1e9 // in nanomina (1 billion = 1.0 mina)
 };
 
-const network = Mina.Network(config);
+const network = Mina.Network(config.network);
 Mina.setActiveInstance(network);
 
 // Fee payer setup
@@ -71,14 +73,24 @@ await TicTacToe.compile();
 
 if(process.argv[2] === "deploy")
 {
-  await deploy(config, feePayerPrivateKey, zkAppPrivateKey, zkApp);
+  try {
+    await deploy(config, feePayerPrivateKey, zkAppPrivateKey, zkApp, "TicTacToe");
+
+  } catch (e) {
+    console.log(e);
+  }
+
 }
 else if(process.argv[2] === "dumpstate") 
 {
-  await deploy(config, feePayerPrivateKey, zkAppPrivateKey, zkApp);
 
   try {
-    console.log('initial state of the zkApp');
+
+  // await deploy(config, feePayerPrivateKey, zkAppPrivateKey, zkApp, "TicTacToe");
+
+    await fetchTest();
+    
+    console.log(`initial state of the zkApp '${zkAppPublicKey.toBase58()}' = ${Mina.hasAccount(zkAppPublicKey)}`);
     let zkAppState = Mina.getAccount(zkAppPublicKey);
 
     for (const i in [0, 1, 2, 3, 4, 5, 6, 7]) {
@@ -88,7 +100,17 @@ else if(process.argv[2] === "dumpstate")
   } catch (e) {
     console.log(e);
   }
+}
+else if(process.argv[2] === "testgql") 
+{
 
+  try {
+
+    await fetchTest2();    
+    
+  } catch (e) {
+    console.log(e);
+  }
 }
 
 // Release previously acquired key pair

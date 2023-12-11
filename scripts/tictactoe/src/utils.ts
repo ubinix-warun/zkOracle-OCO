@@ -25,7 +25,7 @@ export async function isFileExists(f: string) {
   }
 }
 
-export async function deploy(config: any, feePayerKey: PrivateKey, zkAppKey: PrivateKey, zkApp: SmartContract) {
+export async function deploy(config: any, feePayerKey: PrivateKey, zkAppKey: PrivateKey, zkApp: SmartContract, tag: string) {
 
   // Create a new instance of the contract
   console.log('\n\n====== DEPLOYING ======\n\n');
@@ -50,20 +50,109 @@ export async function deploy(config: any, feePayerKey: PrivateKey, zkAppKey: Pri
       console.log(`Success! Update transaction sent.
     Your smart contract state will be updated
     as soon as the transaction is included in a block.
-    Txn hash: ${pendingTx.hash()}`);
+    Txn hash: ${pendingTx.hash()}
+    `);
   }
 
   console.log('Waiting for transaction inclusion in a block.');
   await pendingTx.wait({ maxAttempts: 90 });
           
   if (pendingTx?.hash() !== undefined) {
-      console.log(`Success! Deploy TicTacToe transaction sent.
-
-  Your smart contract state will be updated
-  as soon as the transaction is included in a block:
-    ${getTxnUrl(config.mina, pendingTx.hash())}
+      console.log(`Success! Deploy ${tag} transaction sent.
+    Your smart contract state will be updated
+    as soon as the transaction is included in a block:
+    ${getTxnUrl(config.network.mina, pendingTx.hash())}
     `);
 
   }
+
+}
+
+export async function fetchTest() {
+
+async function fetchGraphQL(operationsDoc:string, operationName:string, variables:object) {
+  
+  const req = JSON.stringify({
+    query: operationsDoc,
+    variables: variables
+  });
+  const result = await fetch(
+    "http://localhost:8080/graphql",
+    {
+      method: "POST",
+      body: req 
+    }
+  );
+
+  console.log(req)
+  console.log(result);
+
+  return await result.json();
+}
+
+const operationsDoc = `
+  query XyQuery {
+    version
+    account(publicKey: "B62qjnFHTRXgRNyAEgyH4dhaU93MshJUMtdRDrZgAqcyTfMgRkriH9Z") {
+      nonce
+      inferredNonce
+      receiptChainHash
+      delegate
+      locked
+      index
+      zkappUri
+      provedState
+      tokenSymbol
+      leafHash
+      zkappState
+    }
+  }
+`;
+
+function fetchMyQuery() {
+  return fetchGraphQL(
+    operationsDoc,
+    "MyQuery",
+    {}
+  );
+}
+
+async function startFetchMyQuery() {
+  const { errors, data } = await fetchMyQuery();
+
+  if (errors) {
+    // handle those errors like a pro
+    console.error(errors);
+  }
+
+  // do something great with this precious data
+  console.log(data);
+}
+
+await startFetchMyQuery();
+
+}
+
+
+export async function fetchTest2() {
+
+  var myHeaders = new Headers();
+myHeaders.append("Content-Type", "application/json");
+
+var graphql = JSON.stringify({
+  query: "query Account {\n    account(publicKey: \"B62qjnFHTRXgRNyAEgyH4dhaU93MshJUMtdRDrZgAqcyTfMgRkriH9Z\") {\n        publicKey\n        tokenId\n        token\n        nonce\n        inferredNonce\n        receiptChainHash\n        delegate\n        votingFor\n        stakingActive\n        privateKeyPath\n        locked\n        index\n        zkappUri\n        zkappState\n        provedState\n        tokenSymbol\n        actionState\n        leafHash\n    }\n}\n",
+  variables: {}
+})
+var requestOptions:RequestInit = {
+  method: 'POST',
+  headers: myHeaders,
+  body: graphql,
+  redirect: 'follow'
+};
+
+await fetch("http://localhost:8080/graphql", requestOptions)
+  .then(response => response.text())
+  .then(result => console.log(result))
+  .catch(error => console.log('error', error));
 
 }

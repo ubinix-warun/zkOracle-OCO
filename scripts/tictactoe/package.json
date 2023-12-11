@@ -23,8 +23,9 @@
     "lint": "npx eslint src/* --fix",
     "lightnet:up": "zk lightnet start -b berkeley -m single-node",
     "lightnet:down": "zk lightnet stop",
+    "lightnet:status": "zk lightnet status",
     "lightnet:deploy": "pnpm run build && node build/src/interact.js deploy",
-    "lightnet:debug:dumpstate": "pnpm run build && node build/src/interact.js dumpstate"
+    "lightnet:debug:testgql": "pnpm run build && node build/src/interact.js testgql"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.16.4",
