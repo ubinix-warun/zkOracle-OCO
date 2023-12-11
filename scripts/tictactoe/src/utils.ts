@@ -1,6 +1,6 @@
 
 import fs from 'fs/promises';
-import { AccountUpdate, Mina, PrivateKey, SmartContract } from 'o1js';
+import { AccountUpdate, Lightnet, Mina, PrivateKey, SmartContract } from 'o1js';
 
 
 export function getTxnUrl(graphQlUrl: string, txnHash: string | undefined) {
@@ -25,14 +25,8 @@ export async function isFileExists(f: string) {
   }
 }
 
-export async function deploy(config: any, feePayerKey: PrivateKey, zkAppKey: PrivateKey, zkApp: SmartContract, tag: string) {
+export async function processTx(config:any, sentTx: Mina.Transaction, keys: PrivateKey[], tag: string) {
 
-  // Create a new instance of the contract
-  console.log('\n\n====== DEPLOYING ======\n\n');
-  const sentTx = await Mina.transaction({ sender: feePayerKey.toPublicKey(), fee: config.fee }, () => {
-    AccountUpdate.fundNewAccount(feePayerKey.toPublicKey());
-    zkApp.deploy();
-  });
   console.log('Build transaction and create proof...');
   await sentTx.prove();
 
@@ -44,7 +38,7 @@ export async function deploy(config: any, feePayerKey: PrivateKey, zkAppKey: Pri
    * that's why we don't need `tx.sign()` for the later transactions.)
    */
   console.log('Sending the transaction.');
-  let pendingTx = await sentTx.sign([zkAppKey, feePayerKey]).send();
+  let pendingTx = await sentTx.sign(keys).send();
 
   if (pendingTx.hash() !== undefined) {
       console.log(`Success! Update transaction sent.
@@ -58,7 +52,7 @@ export async function deploy(config: any, feePayerKey: PrivateKey, zkAppKey: Pri
   await pendingTx.wait({ maxAttempts: 90 });
           
   if (pendingTx?.hash() !== undefined) {
-      console.log(`Success! Deploy ${tag} transaction sent.
+      console.log(`Success! ${tag} transaction sent.
     Your smart contract state will be updated
     as soon as the transaction is included in a block:
     ${getTxnUrl(config.network.mina, pendingTx.hash())}
@@ -68,29 +62,75 @@ export async function deploy(config: any, feePayerKey: PrivateKey, zkAppKey: Pri
 
 }
 
-export async function fetchTest() {
-
-async function fetchGraphQL(operationsDoc:string, operationName:string, variables:object) {
-  
-  const req = JSON.stringify({
-    query: operationsDoc,
-    variables: variables
-  });
-  const result = await fetch(
-    "http://localhost:8080/graphql",
-    {
-      method: "POST",
-      body: req 
-    }
-  );
-
-  console.log(req)
-  console.log(result);
-
-  return await result.json();
+export async function storePrivateKey(path:string, key: PrivateKey)
+{
+  await fs.writeFile(path, JSON.stringify({
+    privateKey: key.toBase58(),
+    publicKey: key.toPublicKey()
+  }, null, 2))
 }
 
-const operationsDoc = `
+export async function initialKeyPairFromLightnet(path:string)
+{
+  // await fs.mkdir("keys");
+  if (!(await isFileExists(path))) {
+    
+    const feePayerPrivateKey = (await Lightnet.acquireKeyPair()).privateKey
+    const feePayerAccount = feePayerPrivateKey.toPublicKey();
+
+    await storePrivateKey(path, feePayerPrivateKey);
+
+    console.log('Acquire feePayerPrivateKey ...');
+
+  }
+
+  let feePayerKeysBase58: { privateKey: string; publicKey: string } = 
+  JSON.parse(
+    await fs.readFile(path, 'utf8')
+  );
+
+  return  feePayerKeysBase58;
+}
+
+export async function initialZkAppKey(path:string)
+{
+  // await fs.mkdir("keys");
+  if (!(await isFileExists(path))) {
+    
+    const zkAppPrivateKey = PrivateKey.random();
+
+    await storePrivateKey(path, zkAppPrivateKey);
+
+    console.log('Generate zkAppPrivateKey ...');
+
+  }
+
+  let zkAppKeysBase58: { privateKey: string; publicKey: string } = 
+  JSON.parse(
+    await fs.readFile(path, 'utf8')
+  );
+
+  return  zkAppKeysBase58;
+}
+
+export async function deploy(config: any, feePayerKey: PrivateKey, zkAppKey: PrivateKey, zkApp: SmartContract, tag: string) {
+
+  // Create a new instance of the contract
+  console.log('\n\n====== DEPLOYING ======\n\n');
+  const sentTx = await Mina.transaction({ sender: feePayerKey.toPublicKey(), fee: config.fee }, () => {
+    AccountUpdate.fundNewAccount(feePayerKey.toPublicKey());
+    zkApp.deploy();
+  });
+
+  await processTx(config, sentTx, [zkAppKey, feePayerKey], tag);
+}
+
+export async function fetchTestGQL() {
+
+  var myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+
+  const operationsDoc = `
   query XyQuery {
     version
     account(publicKey: "B62qjnFHTRXgRNyAEgyH4dhaU93MshJUMtdRDrZgAqcyTfMgRkriH9Z") {
@@ -109,50 +149,23 @@ const operationsDoc = `
   }
 `;
 
-function fetchMyQuery() {
-  return fetchGraphQL(
-    operationsDoc,
-    "MyQuery",
-    {}
-  );
-}
+  var graphql = JSON.stringify({
+    query: operationsDoc,
+    variables: {}
+  });
 
-async function startFetchMyQuery() {
-  const { errors, data } = await fetchMyQuery();
+  // var graphql = JSON.stringify({
+  //   query: "query Account {\n    account(publicKey: \"B62qjnFHTRXgRNyAEgyH4dhaU93MshJUMtdRDrZgAqcyTfMgRkriH9Z\") {\n        publicKey\n        tokenId\n        token\n        nonce\n        inferredNonce\n        receiptChainHash\n        delegate\n        votingFor\n        stakingActive\n        privateKeyPath\n        locked\n        index\n        zkappUri\n        zkappState\n        provedState\n        tokenSymbol\n        actionState\n        leafHash\n    }\n}\n",
+  //   variables: {}
+  // })
+  var requestOptions: RequestInit = {
+    method: 'POST',
+    headers: myHeaders,
+    body: graphql,
+    redirect: 'follow'
+  };
 
-  if (errors) {
-    // handle those errors like a pro
-    console.error(errors);
-  }
-
-  // do something great with this precious data
-  console.log(data);
-}
-
-await startFetchMyQuery();
-
-}
-
-
-export async function fetchTest2() {
-
-  var myHeaders = new Headers();
-myHeaders.append("Content-Type", "application/json");
-
-var graphql = JSON.stringify({
-  query: "query Account {\n    account(publicKey: \"B62qjnFHTRXgRNyAEgyH4dhaU93MshJUMtdRDrZgAqcyTfMgRkriH9Z\") {\n        publicKey\n        tokenId\n        token\n        nonce\n        inferredNonce\n        receiptChainHash\n        delegate\n        votingFor\n        stakingActive\n        privateKeyPath\n        locked\n        index\n        zkappUri\n        zkappState\n        provedState\n        tokenSymbol\n        actionState\n        leafHash\n    }\n}\n",
-  variables: {}
-})
-var requestOptions:RequestInit = {
-  method: 'POST',
-  headers: myHeaders,
-  body: graphql,
-  redirect: 'follow'
-};
-
-await fetch("http://localhost:8080/graphql", requestOptions)
-  .then(response => response.text())
-  .then(result => console.log(result))
-  .catch(error => console.log('error', error));
+  const result = await fetch("http://localhost:8080/graphql", requestOptions);
+  return await result.json();
 
 }

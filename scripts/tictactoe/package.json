@@ -22,10 +22,11 @@
     "testw": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
     "lint": "npx eslint src/* --fix",
     "lightnet:up": "zk lightnet start -b berkeley -m single-node",
-    "lightnet:down": "zk lightnet stop",
+    "lightnet:down": "zk lightnet stop && rm keys/tictactoe-acquire*",
     "lightnet:status": "zk lightnet status",
     "lightnet:deploy": "pnpm run build && node build/src/interact.js deploy",
-    "lightnet:debug:testgql": "pnpm run build && node build/src/interact.js testgql"
+    "lightnet:debug:testgql": "pnpm run build && node build/src/interact.js testgql",
+    "lightnet:play:demo": "pnpm run build && node build/src/interact.js play:demo"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.16.4",
