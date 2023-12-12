@@ -150,6 +150,11 @@ class TicTacToe extends SmartContract {
   @state(PublicKey) player1 = State<PublicKey>();
   @state(PublicKey) player2 = State<PublicKey>();
 
+  events = {
+    'start-game': Field,
+    'play': Field,
+  };
+
   init() {
     super.init();
     this.gameDone.set(Bool(true));
@@ -168,6 +173,9 @@ class TicTacToe extends SmartContract {
     this.board.set(Field(0));
     // player 1 starts
     this.nextIsPlayer2.set(Bool(false));
+
+    this.board.assertEquals(Field(0));
+    this.emitEvent("start-game", Field(this.board.get()));
   }
 
   // board:
@@ -224,5 +232,7 @@ class TicTacToe extends SmartContract {
     // 6. did I just win? If so, update the state as well
     const won = board.checkWinner();
     this.gameDone.set(won);
+
+    this.emitEvent("play", Field(0));
   }
 }

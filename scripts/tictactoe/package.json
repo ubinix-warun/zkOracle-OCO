@@ -26,7 +26,8 @@
     "lightnet:status": "zk lightnet status",
     "lightnet:deploy": "pnpm run build && node build/src/interact.js deploy",
     "lightnet:debug:testgql": "pnpm run build && node build/src/interact.js testgql",
-    "lightnet:play:demo": "pnpm run build && node build/src/interact.js play:demo"
+    "lightnet:play:demo": "pnpm run build && node build/src/interact.js play:demo",
+    "lightnet:worker:demo": "pnpm run build && node build/src/worker.js play:demo"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.16.4",
