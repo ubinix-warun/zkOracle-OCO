@@ -28,12 +28,12 @@ import fs from 'fs/promises';
 
 // Network configuration
 const config = {
-network: {
-    mina: 'http://localhost:8080/graphql',
-    archive: 'http://localhost:8282',
-    lightnetAccountManager: 'http://localhost:8181'
-},
-fee: Number("0.1") * 1e9 // in nanomina (1 billion = 1.0 mina)
+    network: {
+        mina: 'http://localhost:8080/graphql',
+        archive: 'http://localhost:8282',
+        lightnetAccountManager: 'http://localhost:8181'
+    },
+    fee: Number("0.1") * 1e9 // in nanomina (1 billion = 1.0 mina)
 };
 
 const network = Mina.Network(config.network);

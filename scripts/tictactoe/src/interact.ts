@@ -1,13 +1,14 @@
 /**
  * This file specifies how to run the `TicTacToe` smart contract locally using the `Mina.LocalBlockchain()` method.
- * The `Mina.LocalBlockchain()` method specifies a ledger of accounts and contains logic for updating the ledger.
+ * The `Mina.Network()` method specifies a ledger of accounts and contains logic for updating the ledger.
  *
  * Please note that this deployment is local and does not deploy to a live network.
  * If you wish to deploy to a live network, please use the zkapp-cli to deploy.
  *
  * To run locally:
- * Build the project: `$ npm run build`
- * Run with node:     `$ node build/src/interact.js`.
+ * Build the project: `$ pnpm run build`
+ * Run with node:     `$ node build/src/interact.js deploy`.
+ *                    `$ node build/src/interact.js play:demo`.
  */
 
 import {
@@ -27,15 +28,19 @@ import fs from 'fs/promises';
 
 // Network configuration
 const config = {
-  network: {
-    mina: 'http://localhost:8080/graphql',
-    archive: 'http://localhost:8282',
-    lightnetAccountManager: 'http://localhost:8181'
-  },
-  fee: Number("0.1") * 1e9 // in nanomina (1 billion = 1.0 mina)
+  "lightnet": {
+    network: {
+      mina: 'http://localhost:8080/graphql',
+      archive: 'http://localhost:8282',
+      lightnetAccountManager: 'http://localhost:8181'
+    },
+    fee: Number("0.1") * 1e9 // in nanomina (1 billion = 1.0 mina)
+  }
 };
 
-const network = Mina.Network(config.network);
+const activeConfig = config["lightnet"];
+
+const network = Mina.Network(activeConfig.network);
 Mina.setActiveInstance(network);
 
 const feePayerBase58 = await initialKeyPairFromLightnet('keys/tictactoe-acquireFeePayer.key');
@@ -56,7 +61,7 @@ await TicTacToe.compile();
 if(process.argv[2] === "deploy")
 {
   try {
-    await deploy(config, feePayerPrivateKey, 
+    await deploy(activeConfig, feePayerPrivateKey, 
         zkAppPrivateKey, zkApp, "Deploy TicTacToe");
 
   } catch (e) {
@@ -80,12 +85,12 @@ else if(process.argv[2] === "play:demo")
 
     // Create a new instance of the contract
     console.log('\n\n====== START GAME ======\n\n');
-    const sentTx = await Mina.transaction({ sender: feePayerPrivateKey.toPublicKey(), fee: config.fee }, () => {
+    const sentTx = await Mina.transaction({ sender: feePayerPrivateKey.toPublicKey(), fee: activeConfig.fee }, () => {
       // AccountUpdate.fundNewAccount(feePayerPrivateKey.toPublicKey());
       zkApp.startGame(player1PayerAccount, player2PayerAccount);
     });
 
-    await processTx(config, sentTx, [zkAppPrivateKey, feePayerPrivateKey], "Start Game -- TicTacToe");
+    await processTx(activeConfig, sentTx, [zkAppPrivateKey, feePayerPrivateKey], "Start Game -- TicTacToe");
 
     await fetchAccount({publicKey: zkAppPublicKey});
     let b = zkApp.board.get();
@@ -191,11 +196,11 @@ async function makeMove(
   y0: number
 ) {
   const [x, y] = [Field(x0), Field(y0)];
-  const txn = await Mina.transaction({ sender: currentPlayerKey.toPublicKey(), fee: config.fee }, async () => {
+  const txn = await Mina.transaction({ sender: currentPlayerKey.toPublicKey(), fee: activeConfig.fee }, async () => {
     const signature = Signature.create(currentPlayerKey, [x, y]);
     zkApp.play(currentPlayer, signature, x, y);
   });
   
-  await processTx(config, txn, [currentPlayerKey], "makeMove -- TicTacToe");
+  await processTx(activeConfig, txn, [currentPlayerKey], "makeMove -- TicTacToe");
 
 }
