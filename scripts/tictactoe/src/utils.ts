@@ -2,6 +2,26 @@
 import fs from 'fs/promises';
 import { AccountUpdate, Lightnet, Mina, PrivateKey, SmartContract } from 'o1js';
 
+export const sections = [
+  {
+    header: 'Interact script',
+    content: 'Generates something {italic very} important.'
+  },
+  {
+    header: 'Options',
+    optionList: [
+      {
+        name: 'network',
+        typeLabel: '{underline file}',
+        description: 'lightnet'
+      },
+      {
+        name: 'help',
+        description: 'Print this usage guide.'
+      }
+    ]
+  }
+]
 
 export function getTxnUrl(graphQlUrl: string, txnHash: string | undefined) {
     const txnBroadcastServiceName = new URL(graphQlUrl).hostname
@@ -92,7 +112,7 @@ export async function initialKeyPairFromLightnet(path:string)
   return  feePayerKeysBase58;
 }
 
-export async function initialZkAppKey(path:string)
+export async function initialKey(path:string, tag: string)
 {
   // await fs.mkdir("keys");
   if (!(await isFileExists(path))) {
@@ -101,7 +121,7 @@ export async function initialZkAppKey(path:string)
 
     await storePrivateKey(path, zkAppPrivateKey);
 
-    console.log('Generate zkAppPrivateKey ...');
+    console.log(`Generate ${tag} ...`);
 
   }
 
@@ -111,6 +131,11 @@ export async function initialZkAppKey(path:string)
   );
 
   return  zkAppKeysBase58;
+}
+
+export async function initialZkAppKey(path:string)
+{
+  return  initialKey(path, "zkAppPrivateKey");
 }
 
 export async function deploy(config: any, feePayerKey: PrivateKey, zkAppKey: PrivateKey, zkApp: SmartContract, tag: string) {

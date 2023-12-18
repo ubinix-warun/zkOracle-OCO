@@ -22,26 +22,68 @@ import {
   fetchAccount,
 } from 'o1js';
 import { TicTacToe, Board } from './tictactoe.js';
-import { deploy, fetchTestGQL, initialKeyPairFromLightnet, initialZkAppKey, isFileExists, processTx } from './utils.js';
-
-import fs from 'fs/promises';
+import { deploy, fetchTestGQL, initialKey, initialKeyPairFromLightnet, initialZkAppKey, isFileExists, processTx, sections } from './utils.js';
+import commandLineUsage from 'command-line-usage'
 
 // Network configuration
-const config = {
-  "lightnet": {
-    network: {
-      mina: 'http://localhost:8080/graphql',
-      archive: 'http://localhost:8282',
-      lightnetAccountManager: 'http://localhost:8181'
-    },
-    fee: Number("0.1") * 1e9 // in nanomina (1 billion = 1.0 mina)
-  }
-};
+let config = new Map([
+  [
+    "lightnet", {
+      network: {
+        mina: 'http://localhost:8080/graphql',
+        archive: 'http://localhost:8282',
+        lightnetAccountManager: 'http://localhost:8181'
+      },
+      fee: Number("0.1") * 1e9 // in nanomina (1 billion = 1.0 mina)
+    }
+  ],
+  [
+    "berkeley", {
+      network: {
+        mina: 'https://proxy.berkeley.minaexplorer.com/graphql',
+        archive: 'https://api.minascan.io/archive/berkeley/v1/graphql/',
+        // lightnetAccountManager: 'http://localhost:8181'
+      },
+      fee: Number("0.1") * 1e9 // in nanomina (1 billion = 1.0 mina)
+    }
+  ],
+  [
+    "testworld", {
+      network: {
+        mina: 'https://proxy.testworld.minaexplorer.com/graphql',
+        archive: 'https://api.minascan.io/archive/testworld/v1/graphql/',
+        // lightnetAccountManager: 'http://localhost:8181'
+      },
+      fee: Number("0.1") * 1e9 // in nanomina (1 billion = 1.0 mina)
+    }
+  ]
+  
+]);
 
-const activeConfig = config["lightnet"];
+
+const activeConfig = config.get(process.argv[2]) ;
+
+if (activeConfig === undefined) {
+  console.log(commandLineUsage(sections));
+  process.exit(1);
+}
 
 const network = Mina.Network(activeConfig.network);
 Mina.setActiveInstance(network);
+
+// if(process.argv[2] !== "lightnet") 
+// {
+//   const feePayerKeysBase58 = await initialKey('keys/tictactoe-feePayer.key', "feePayerPrivateKey");
+//   const feePayerPrivateKey = PrivateKey.fromBase58(feePayerKeysBase58.privateKey);
+//   const feePayerAccount = feePayerPrivateKey.toPublicKey();
+
+//   console.log(`Load feePayerPrivateKey ... ${feePayerAccount.toBase58()}`);
+
+//   // await fetchAccount({publicKey: feePayerAccount});
+
+//   console.log(`feePayer '${feePayerKeysBase58.publicKey}' = ${Mina.getAccount(feePayerAccount).balance}`);
+
+// }
 
 const feePayerBase58 = await initialKeyPairFromLightnet('keys/tictactoe-acquireFeePayer.key');
 const feePayerPrivateKey = PrivateKey.fromBase58(feePayerBase58.privateKey);
@@ -58,7 +100,7 @@ const zkApp = new TicTacToe(zkAppPublicKey);
 console.log('Compile the contract ...');
 await TicTacToe.compile();
 
-if(process.argv[2] === "deploy")
+if(process.argv[3] === "deploy")
 {
   try {
     await deploy(activeConfig, feePayerPrivateKey, 
@@ -69,7 +111,7 @@ if(process.argv[2] === "deploy")
   }
 
 }
-else if(process.argv[2] === "play:demo") 
+else if(process.argv[3] === "play:demo") 
 {
 
   try {
@@ -195,6 +237,11 @@ async function makeMove(
   x0: number,
   y0: number
 ) {
+  if(activeConfig === undefined) 
+  {
+    return;
+  }
+  
   const [x, y] = [Field(x0), Field(y0)];
   const txn = await Mina.transaction({ sender: currentPlayerKey.toPublicKey(), fee: activeConfig.fee }, async () => {
     const signature = Signature.create(currentPlayerKey, [x, y]);
