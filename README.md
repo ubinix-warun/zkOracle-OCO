@@ -14,6 +14,7 @@ The integration of OCOs into the Mina Protocol ecosystem represents a significan
 
 
 ### OCO Walkthrough
+- [Setup GitHub Action for zkapp unit testing and coverage badge](https://github.com/ubinix-warun/zkOracle-OCO/tree/main/scripts/coverage-badge/README.md)
 - [Unlocking Zkapp Deployment: Lessons Learned from Tic-Tac-Toe on Lightnet](https://github.com/ubinix-warun/zkOracle-OCO/tree/main/scripts/tictactoe/README.md)
 
 
