@@ -14,7 +14,7 @@ The integration of OCOs into the Mina Protocol ecosystem represents a significan
 
 
 ### OCO Walkthrough
-
+- [Unlocking Zkapp Deployment: Lessons Learned from Tic-Tac-Toe on Lightnet](https://github.com/ubinix-warun/zkOracle-OCO/tree/main/scripts/tictactoe/README.md)
 
 
 ## Contributing
