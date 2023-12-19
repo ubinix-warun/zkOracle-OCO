@@ -1,4 +1,4 @@
-# Mina zkApp: TicTacToe on Lightnet
+# Mina zkApp: TicTacToe on Lightnet https://github.com/ubinix-warun/zkOracle-OCO/issues/2
 
 Tic-tac-toe, a classic game of strategy and chance, can be enhanced with the fascinating technology of zero-knowledge proofs (zk-proofs).
 
