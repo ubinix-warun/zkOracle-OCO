@@ -273,15 +273,29 @@ describe('Token (Erc677)', () => {
           let tx = await Mina.transaction(zkAppBAddress, () => {
             AccountUpdate.fundNewAccount(zkAppBAddress);
             tokenZkapp.transferAndCall(
-              zkOracleAddress,
+              zkAppCAddress,
               UInt64.from(10_000),
               CircuitString.fromString('REQUEST')
             ); // .token.send
             tokenZkapp.requireSignature();
           });
           await tx.prove();
-          tx.sign([zkAppBKey, zkOracleKey, feePayerKey, tokenZkappKey]);
+          tx.sign([zkAppBKey, zkAppCKey, feePayerKey, tokenZkappKey]);
           await tx.send();
+
+          // let tx = await Mina.transaction(zkAppBAddress, () => {
+          //   // AccountUpdate.fundNewAccount(zkAppBAddress);
+          //   tokenZkapp.transferAndCall(
+          //     zkOracleAddress,
+          //     UInt64.from(10_000),
+          //     CircuitString.fromString('REQUEST')
+          //   ); // .token.send
+          //   // tokenZkapp.requireSignature();
+          // });
+          // await tx.prove();
+          // tx.sign([zkAppBKey, tokenZkappKey]);
+          // // tx.sign([zkAppBKey, zkOracleKey, feePayerKey, tokenZkappKey]);
+          // await tx.send();
   
           const events = await tokenZkapp.fetchEvents(UInt32.from(0));
           expect(events[0].type).toEqual('TransferAndCall');
@@ -293,6 +307,49 @@ describe('Token (Erc677)', () => {
             Mina.getBalance(zkOracleAddress, tokenId).value.toBigInt()
           ).toEqual(10_000n);
         });
+
+        // test('token contract can successfully mint and transferAndCall with JSON b64 to oracle (signature)', async () => {
+        //   await (
+        //     await Mina.transaction({ sender: feePayer }, () => {
+        //       AccountUpdate.fundNewAccount(feePayer);
+        //       tokenZkapp.mint(zkAppBAddress, UInt64.from(200_000));
+        //       tokenZkapp.requireSignature();
+        //     })
+        //   )
+        //     .sign([feePayerKey, tokenZkappKey])
+        //     .send();
+        //   expect(
+        //     Mina.getBalance(zkAppBAddress, tokenId).value.toBigInt()
+        //   ).toEqual(200_000n);
+
+        //   var obj = {a: 'a', b: 'b'};
+        //   var encoded = btoa(JSON.stringify(obj));
+
+        //   console.log(encoded);
+
+        //   let tx = await Mina.transaction(zkAppBAddress, () => {
+        //     AccountUpdate.fundNewAccount(zkAppBAddress);
+        //     tokenZkapp.transferAndCall(
+        //       zkOracleAddress,
+        //       UInt64.from(10_000),
+        //       CircuitString.fromString(encoded)
+        //     ); // .token.send
+        //     tokenZkapp.requireSignature();
+        //   });
+        //   await tx.prove();
+        //   tx.sign([zkAppBKey, zkOracleKey, feePayerKey, tokenZkappKey]);
+        //   await tx.send();
+  
+        //   const events = await tokenZkapp.fetchEvents(UInt32.from(0));
+        //   expect(events[0].type).toEqual('TransferAndCall');
+
+        //   expect(
+        //     Mina.getBalance(zkAppBAddress, tokenId).value.toBigInt()
+        //   ).toEqual(190_000n);
+        //   expect(
+        //     Mina.getBalance(zkOracleAddress, tokenId).value.toBigInt()
+        //   ).toEqual(10_000n);
+        // });
 
 
     });
