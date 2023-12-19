@@ -5,7 +5,7 @@ import { AccountUpdate, Lightnet, Mina, PrivateKey, SmartContract } from 'o1js';
 export const sections = [
   {
     header: 'Interact script',
-    content: 'Generates something {italic very} important.'
+    content: 'Deploy and Demo Tictactoe zkApp '
   },
   {
     header: 'Options',
@@ -16,14 +16,16 @@ export const sections = [
         description: 'lightnet'
       },
       {
-        name: 'help',
-        description: 'Print this usage guide.'
+        name: 'interact',
+        description: 'deploy, play:demo'
       }
     ]
   }
 ]
 
 export function getTxnUrl(graphQlUrl: string, txnHash: string | undefined) {
+    console.log(graphQlUrl);
+
     const txnBroadcastServiceName = new URL(graphQlUrl).hostname
       .split('.')
       .filter((item) => item === 'minascan' || item === 'minaexplorer')?.[0];
@@ -89,6 +91,7 @@ export async function storePrivateKey(path:string, key: PrivateKey)
     publicKey: key.toPublicKey()
   }, null, 2))
 }
+
 
 export async function initialKeyPairFromLightnet(path:string)
 {

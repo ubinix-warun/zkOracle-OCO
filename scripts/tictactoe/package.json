@@ -29,6 +29,7 @@
     "lightnet:play:demo": "pnpm run build && node build/src/interact.js lightnet play:demo",
     "lightnet:worker:demo": "pnpm run build && node build/src/worker.js lightnet play:demo",
     "testworld:deploy": "pnpm run build && node build/src/interact.js testworld deploy",
+    "testworld:play:demo": "pnpm run build && node build/src/interact.js testworld play:demo",
     "berkeley:deploy": "pnpm run build && node build/src/interact.js berkeley deploy"
   },
   "devDependencies": {

@@ -71,21 +71,27 @@ if (activeConfig === undefined) {
 const network = Mina.Network(activeConfig.network);
 Mina.setActiveInstance(network);
 
-// if(process.argv[2] !== "lightnet") 
-// {
-//   const feePayerKeysBase58 = await initialKey('keys/tictactoe-feePayer.key', "feePayerPrivateKey");
-//   const feePayerPrivateKey = PrivateKey.fromBase58(feePayerKeysBase58.privateKey);
-//   const feePayerAccount = feePayerPrivateKey.toPublicKey();
+let feePayerBase58;
 
-//   console.log(`Load feePayerPrivateKey ... ${feePayerAccount.toBase58()}`);
+if(process.argv[2] !== "lightnet") 
+{
+  feePayerBase58 = await initialKey('keys/tictactoe-feePayer.key', "feePayerPrivateKey");
+  const feePayerPrivateKey = PrivateKey.fromBase58(feePayerBase58.privateKey);
+  const feePayerAccount = feePayerPrivateKey.toPublicKey();
 
-//   // await fetchAccount({publicKey: feePayerAccount});
+  console.log(`Load feePayerPrivateKey ... `);
 
-//   console.log(`feePayer '${feePayerKeysBase58.publicKey}' = ${Mina.getAccount(feePayerAccount).balance}`);
+  await fetchAccount({publicKey: feePayerAccount});
 
-// }
+  console.log(`feePayer '${feePayerBase58.publicKey}' = ${Mina.getAccount(feePayerAccount).balance}`);
 
-const feePayerBase58 = await initialKeyPairFromLightnet('keys/tictactoe-acquireFeePayer.key');
+} 
+else
+{
+  feePayerBase58 = await initialKeyPairFromLightnet('keys/tictactoe-acquireFeePayer.key');
+
+}
+
 const feePayerPrivateKey = PrivateKey.fromBase58(feePayerBase58.privateKey);
 const feePayerAccount = feePayerPrivateKey.toPublicKey();
 console.log('Load feePayerPrivateKey ...');
@@ -116,14 +122,37 @@ else if(process.argv[3] === "play:demo")
 
   try {
 
-    // Player setup
-    const player1PrivateKey = (await Lightnet.acquireKeyPair()).privateKey
-    const player1PayerAccount = player1PrivateKey.toPublicKey();
-    console.log('Acquire player1PrivateKey ...');
+    let player1PrivateKey;
+    let player2PrivateKey;
 
-    const player2PrivateKey = (await Lightnet.acquireKeyPair()).privateKey
+    if(process.argv[2] !== "lightnet") 
+    {
+      const player1Keys = await initialKey('keys/tictactoe-player1.key', "player1PrivateKey");
+      player1PrivateKey = PrivateKey.fromBase58(player1Keys.privateKey);
+      console.log(`Load player1PrivateKey ... `);
+      const player2Keys = await initialKey('keys/tictactoe-player2.key', "playerPrivateKey");
+      player2PrivateKey = PrivateKey.fromBase58(player2Keys.privateKey);
+      console.log(`Load player2PrivateKey ... `);
+
+    } else 
+    {
+      // Player setup
+      player1PrivateKey = (await Lightnet.acquireKeyPair()).privateKey
+      console.log('Acquire player1PrivateKey ...');
+
+      player2PrivateKey = (await Lightnet.acquireKeyPair()).privateKey
+      console.log('Acquire player2PrivateKey ...');
+    }
+
+    if (player1PrivateKey === undefined ||
+      player2PrivateKey === undefined) {
+      console.log(commandLineUsage(sections));
+      process.exit(1);
+    }
+    
+
+    const player1PayerAccount = player1PrivateKey.toPublicKey();
     const player2PayerAccount = player2PrivateKey.toPublicKey();
-    console.log('Acquire player2PrivateKey ...');
 
     // Create a new instance of the contract
     console.log('\n\n====== START GAME ======\n\n');
@@ -241,7 +270,7 @@ async function makeMove(
   {
     return;
   }
-  
+
   const [x, y] = [Field(x0), Field(y0)];
   const txn = await Mina.transaction({ sender: currentPlayerKey.toPublicKey(), fee: activeConfig.fee }, async () => {
     const signature = Signature.create(currentPlayerKey, [x, y]);
