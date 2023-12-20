@@ -15,8 +15,6 @@ The integration of OCOs into the Mina Protocol ecosystem represents a significan
 
 ### OCO Walkthrough
 
-
-
 ## Contributing
 
 For information on how to make technical and non-technical contributions, see the repository contributing guidelines in [CONTRIBUTING](https://github.com/ubinix-warun/zkOracle-OCO/blob/develop/CONTRIBUTING.md) and the [Contributing Guide]() docs.
