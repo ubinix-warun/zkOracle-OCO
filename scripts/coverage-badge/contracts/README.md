@@ -1,24 +1,24 @@
-# Mina zkApp: PROJECT_NAME
+# Mina zkApp: Add SmartContract
 
 This template uses TypeScript.
 
 ## How to build
 
 ```sh
-npm run build
+pnpm run build
 ```
 
 ## How to run tests
 
 ```sh
-npm run test
-npm run testw # watch mode
+pnpm run test
+pnpm run testw # watch mode
 ```
 
 ## How to run coverage
 
 ```sh
-npm run coverage
+pnpm run coverage
 ```
 
 ## License

@@ -20,7 +20,8 @@
     "format": "prettier --write --ignore-unknown **/*",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "testw": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
-    "lint": "npx eslint src/* --fix"
+    "lint": "npx eslint src/* --fix",
+    "prepare": "cd ../../.. && husky install scripts/coverage-badge/contracts/.husky"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.16.4",
@@ -30,6 +31,7 @@
     "@typescript-eslint/parser": "^5.5.0",
     "eslint": "^8.7.0",
     "eslint-plugin-o1js": "^0.4.0",
+    "husky": "^8.0.3",
     "jest": "^27.3.1",
     "prettier": "^2.3.2",
     "ts-jest": "^27.0.7",
