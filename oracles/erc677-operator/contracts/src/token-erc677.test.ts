@@ -89,6 +89,7 @@ function setupAccounts() {
   zkOracleKey = Local.testAccounts[3].privateKey;
   zkOracleAddress = zkOracleKey.toPublicKey();
   zkOracle = new OracleContract(zkOracleAddress, tokenId);
+  
   return Local;
 }
 
@@ -101,21 +102,14 @@ async function setupLocal() {
       amount: Mina.accountCreationFee(),
     });
     tokenZkapp.deploy();
+    // feePayerUpdate.send({
+    //   to: zkOracleAddress,
+    //   amount: Mina.accountCreationFee(),
+    // });
+    // zkOracle.deploy();
   });
-  tx.sign([tokenZkappKey, feePayerKey]);
+  tx.sign([tokenZkappKey, zkOracleKey, feePayerKey]);
   await tx.send();
-
-  // let tx2 = await Mina.transaction(feePayer, () => {
-  //   let feePayerUpdate = AccountUpdate.fundNewAccount(feePayer);
-  //   feePayerUpdate.send({
-  //     to: zkOracleAddress,
-  //     amount: Mina.accountCreationFee(),
-  //   });
-  //   zkOracle.deploy();
-  // });
-  // tx2.sign([zkOracleKey, feePayerKey]);
-  // await tx2.send();
-
 }
 
 async function setupLocalProofs() {
@@ -273,15 +267,18 @@ describe('Token (Erc677)', () => {
           let tx = await Mina.transaction(zkAppBAddress, () => {
             AccountUpdate.fundNewAccount(zkAppBAddress);
             tokenZkapp.transferAndCall(
-              zkAppCAddress,
+              zkOracleAddress,
               UInt64.from(10_000),
               CircuitString.fromString('REQUEST')
             ); // .token.send
             tokenZkapp.requireSignature();
           });
+          // await tx.prove();
+          // tx.sign([zkAppBKey, zkAppCKey, feePayerKey, tokenZkappKey]);
+          // await tx.send();
+
           await tx.prove();
-          tx.sign([zkAppBKey, zkAppCKey, feePayerKey, tokenZkappKey]);
-          await tx.send();
+          await (await tx.sign([zkAppBKey, zkOracleKey, feePayerKey, tokenZkappKey]).send()).wait();
 
           // let tx = await Mina.transaction(zkAppBAddress, () => {
           //   // AccountUpdate.fundNewAccount(zkAppBAddress);
