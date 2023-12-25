@@ -1,10 +1,10 @@
-# Mina zkApp: TicTacToe on Lightnet
+# Mina zkApp: TicTacToe on Lightnet https://github.com/ubinix-warun/zkOracle-OCO/issues/2
 
 Tic-tac-toe, a classic game of strategy and chance, can be enhanced with the fascinating technology of zero-knowledge proofs (zk-proofs).
 
 The previously described Tic-Tac-Toe implementation can be further enhanced by running the mina node server in a local development environment using Lightnet.
 
-<img src="https://github-production-user-asset-6210df.s3.amazonaws.com/3756229/289445176-174497e1-6c33-4065-a9c6-7dafc6a8d7ba.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20231211%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20231211T064035Z&X-Amz-Expires=300&X-Amz-Signature=49ac50729cb8aeb87dfff1f9d137a095d3033aa4357229a3e6e2582ecd1db198&X-Amz-SignedHeaders=host&actor_id=0&key_id=0&repo_id=0" >
+<img src="https://raw.githubusercontent.com/ubinix-warun/zkOracle-OCO/main/scripts/tictactoe/Screenshot%202566-12-11%20at%2013.30.52.png" />
 
 
 ## How to build
@@ -17,6 +17,19 @@ pnpm run build
 
 ```sh
 pnpm run test
+
+ PASS  src/tictactoe.test.ts (75.54 s)
+  tictactoe
+    ✓ generates and deploys tictactoe (1181 ms)
+    ✓ deploys tictactoe & accepts a correct move (62687 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       2 passed, 2 total
+Snapshots:   0 total
+Time:        75.592 s
+Ran all test suites.
+
+
 pnpm run testw # watch mode
 ```
 
