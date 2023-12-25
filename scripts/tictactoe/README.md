@@ -17,6 +17,19 @@ pnpm run build
 
 ```sh
 pnpm run test
+
+ PASS  src/tictactoe.test.ts (75.54 s)
+  tictactoe
+    ✓ generates and deploys tictactoe (1181 ms)
+    ✓ deploys tictactoe & accepts a correct move (62687 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       2 passed, 2 total
+Snapshots:   0 total
+Time:        75.592 s
+Ran all test suites.
+
+
 pnpm run testw # watch mode
 ```
 
