@@ -22,7 +22,7 @@ import {
   fetchAccount,
 } from 'o1js';
 import { TicTacToe, Board } from './tictactoe.js';
-import { deploy, fetchTestGQL, initialKey, initialKeyPairFromLightnet, initialZkAppKey, isFileExists, processTx, sections } from './utils.js';
+import { deploy, fetchTestGQL, initialFeePayer, initialKey, initialKeyPairFromLightnet, initialPlayers, initialZkAppKey, isFileExists, processTx, sections } from './utils.js';
 import commandLineUsage from 'command-line-usage'
 
 // Network configuration
@@ -69,28 +69,9 @@ if (activeConfig === undefined) {
 }
 
 const network = Mina.Network(activeConfig.network);
-Mina.setActiveInstance(network);
+Mina.setActiveInstance(network); 
 
-let feePayerBase58;
-
-if(process.argv[2] !== "lightnet") 
-{
-  feePayerBase58 = await initialKey('keys/tictactoe-feePayer.key', "feePayerPrivateKey");
-  const feePayerPrivateKey = PrivateKey.fromBase58(feePayerBase58.privateKey);
-  const feePayerAccount = feePayerPrivateKey.toPublicKey();
-
-  console.log(`Load feePayerPrivateKey ... `);
-
-  await fetchAccount({publicKey: feePayerAccount});
-
-  console.log(`feePayer '${feePayerBase58.publicKey}' = ${Mina.getAccount(feePayerAccount).balance}`);
-
-} 
-else
-{
-  feePayerBase58 = await initialKeyPairFromLightnet('keys/tictactoe-acquireFeePayer.key');
-
-}
+let feePayerBase58 = await initialFeePayer(process.argv[2]);
 
 const feePayerPrivateKey = PrivateKey.fromBase58(feePayerBase58.privateKey);
 const feePayerAccount = feePayerPrivateKey.toPublicKey();
@@ -117,39 +98,25 @@ if(process.argv[3] === "deploy")
   }
 
 }
+else if(process.argv[3] === "play:demo:proxy") 
+{
+
+}
 else if(process.argv[3] === "play:demo") 
 {
 
   try {
 
-    let player1PrivateKey;
-    let player2PrivateKey;
+    let keys = await initialPlayers(process.argv[2]);
 
-    if(process.argv[2] !== "lightnet") 
-    {
-      const player1Keys = await initialKey('keys/tictactoe-player1.key', "player1PrivateKey");
-      player1PrivateKey = PrivateKey.fromBase58(player1Keys.privateKey);
-      console.log(`Load player1PrivateKey ... `);
-      const player2Keys = await initialKey('keys/tictactoe-player2.key', "playerPrivateKey");
-      player2PrivateKey = PrivateKey.fromBase58(player2Keys.privateKey);
-      console.log(`Load player2PrivateKey ... `);
-
-    } else 
-    {
-      // Player setup
-      player1PrivateKey = (await Lightnet.acquireKeyPair()).privateKey
-      console.log('Acquire player1PrivateKey ...');
-
-      player2PrivateKey = (await Lightnet.acquireKeyPair()).privateKey
-      console.log('Acquire player2PrivateKey ...');
-    }
+    let player1PrivateKey = keys.pk1;
+    let player2PrivateKey = keys.pk2;
 
     if (player1PrivateKey === undefined ||
       player2PrivateKey === undefined) {
       console.log(commandLineUsage(sections));
       process.exit(1);
     }
-    
 
     const player1PayerAccount = player1PrivateKey.toPublicKey();
     const player2PayerAccount = player2PrivateKey.toPublicKey();
@@ -258,6 +225,39 @@ else if(process.argv[2] === "testgql")
   } catch (e) {
     console.log(e);
   }
+
+}
+else if(process.argv[3] === "play:composing") 
+{
+  try {
+
+    let player1PrivateKey;
+    if(process.argv[2] !== "lightnet") 
+    {
+      const player1Keys = await initialKey('keys/tictactoe-player1.key', "player1PrivateKey");
+      player1PrivateKey = PrivateKey.fromBase58(player1Keys.privateKey);
+      console.log(`Load player1PrivateKey ...`);
+
+    } else 
+    {
+      // Player setup
+      player1PrivateKey = (await Lightnet.acquireKeyPair()).privateKey
+      console.log('Acquire player1PrivateKey ...');
+
+    }
+
+    if (player1PrivateKey === undefined) {
+      console.log(commandLineUsage(sections));
+      process.exit(1);
+    }
+    
+    const player1PayerAccount = player1PrivateKey.toPublicKey();
+
+
+  } catch (e) {
+    console.log(e);
+  }
+
 }
 
 async function makeMove(

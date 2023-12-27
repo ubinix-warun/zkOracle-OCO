@@ -1,6 +1,6 @@
 
 import fs from 'fs/promises';
-import { AccountUpdate, Lightnet, Mina, PrivateKey, SmartContract } from 'o1js';
+import { AccountUpdate, Lightnet, Mina, PrivateKey, SmartContract, fetchAccount } from 'o1js';
 
 export const sections = [
   {
@@ -45,6 +45,64 @@ export async function isFileExists(f: string) {
   } catch {
     return false;
   }
+}
+
+export async function initialFeePayer(network: string) 
+{
+  let feePayerBase58;
+
+  if(network !== "lightnet") 
+  {
+    feePayerBase58 = await initialKey('keys/tictactoe-feePayer.key', "feePayerPrivateKey");
+    const feePayerPrivateKey = PrivateKey.fromBase58(feePayerBase58.privateKey);
+    const feePayerAccount = feePayerPrivateKey.toPublicKey();
+
+    console.log(`Load feePayerPrivateKey ... `);
+
+    await fetchAccount({publicKey: feePayerAccount});
+
+    console.log(`feePayer '${feePayerBase58.publicKey}' = ${Mina.getAccount(feePayerAccount).balance}`);
+
+  } 
+  else
+  {
+    feePayerBase58 = await initialKeyPairFromLightnet('keys/tictactoe-acquireFeePayer.key');
+
+  }
+
+  return feePayerBase58;
+
+}
+
+export async function initialPlayers(network: string) 
+{
+  let player1PrivateKey;
+  let player2PrivateKey;
+
+  if(network !== "lightnet") 
+  {
+    const player1Keys = await initialKey('keys/tictactoe-player1.key', "player1PrivateKey");
+    player1PrivateKey = PrivateKey.fromBase58(player1Keys.privateKey);
+    console.log(`Load player1PrivateKey ... `);
+    const player2Keys = await initialKey('keys/tictactoe-player2.key', "playerPrivateKey");
+    player2PrivateKey = PrivateKey.fromBase58(player2Keys.privateKey);
+    console.log(`Load player2PrivateKey ... `);
+
+  } else 
+  {
+    // Player setup
+    player1PrivateKey = (await Lightnet.acquireKeyPair()).privateKey
+    console.log('Acquire player1PrivateKey ...');
+
+    player2PrivateKey = (await Lightnet.acquireKeyPair()).privateKey
+    console.log('Acquire player2PrivateKey ...');
+  }
+
+  return {
+    pk1: player1PrivateKey,
+    pk2: player2PrivateKey
+  }
+
 }
 
 export async function processTx(config:any, sentTx: Mina.Transaction, keys: PrivateKey[], tag: string) {
