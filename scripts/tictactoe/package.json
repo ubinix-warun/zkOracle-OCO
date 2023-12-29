@@ -25,6 +25,7 @@
     "lightnet:down": "zk lightnet stop && rm keys/tictactoe-acquire*",
     "lightnet:status": "zk lightnet status",
     "lightnet:deploy": "pnpm run build && node build/src/interact.js lightnet deploy",
+    "lightnet:deploy:proxy": "pnpm run build && node build/src/interact.js lightnet deploy:proxy",
     "lightnet:debug:testgql": "pnpm run build && node build/src/interact.js lightnet testgql",
     "lightnet:play:demo": "pnpm run build && node build/src/interact.js lightnet play:demo",
     "lightnet:play:demo:proxy": "pnpm run build && node build/src/interact.js lightnet play:demo:proxy",
