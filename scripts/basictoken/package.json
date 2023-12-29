@@ -1,5 +1,5 @@
 {
-  "name": "package-name",
+  "name": "basictoken",
   "version": "0.1.0",
   "description": "",
   "author": "",
@@ -22,35 +22,26 @@
     "testw": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
     "lint": "npx eslint src/* --fix",
     "lightnet:up": "zk lightnet start -b berkeley -m single-node",
-    "lightnet:down": "zk lightnet stop && rm keys/tictactoe-acquire*",
+    "lightnet:down": "zk lightnet stop && rm keys/basictoken-acquire*",
     "lightnet:status": "zk lightnet status",
-    "lightnet:deploy": "pnpm run build && node build/src/interact.js lightnet deploy",
-    "lightnet:debug:testgql": "pnpm run build && node build/src/interact.js lightnet testgql",
-    "lightnet:play:demo": "pnpm run build && node build/src/interact.js lightnet play:demo",
-    "lightnet:play:demo:proxy": "pnpm run build && node build/src/interact.js lightnet play:demo:proxy",
-    "lightnet:worker:demo": "pnpm run build && node build/src/worker.js lightnet play:demo",
-    "testworld:deploy": "pnpm run build && node build/src/interact.js testworld deploy",
-    "testworld:play:demo": "pnpm run build && node build/src/interact.js testworld play:demo",
-    "berkeley:deploy": "pnpm run build && node build/src/interact.js berkeley deploy"
+    "lightnet:deploy": "pnpm run build && node build/src/interact.js lightnet deploy"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.16.4",
     "@babel/preset-typescript": "^7.16.0",
-    "@types/command-line-usage": "^5.0.4",
     "@types/jest": "^27.0.3",
-    "@types/node": "^20.10.4",
+    "@types/node": "^20.10.5",
     "@typescript-eslint/eslint-plugin": "^5.5.0",
     "@typescript-eslint/parser": "^5.5.0",
-    "command-line-usage": "^7.0.1",
+    "@zkoracle/opennautilus-contracts": "^0.4.2",
     "eslint": "^8.7.0",
     "eslint-plugin-o1js": "^0.4.0",
     "jest": "^27.3.1",
-    "o1js": "^0.15.0",
     "prettier": "^2.3.2",
     "ts-jest": "^27.0.7",
     "typescript": "^4.7.2"
   },
   "peerDependencies": {
-    "o1js": "0.14.*"
+    "o1js": "0.15.*"
   }
 }
