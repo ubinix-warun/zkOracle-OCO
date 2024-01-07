@@ -24,6 +24,7 @@ import {
 import { TicTacToe, Board } from './tictactoe.js';
 import { deploy, fetchTestGQL, initialFeePayer, initialKey, initialKeyPairFromLightnet, initialPlayers, initialZkAppKey, isFileExists, processTx, sections } from './utils.js';
 import commandLineUsage from 'command-line-usage'
+import { TicTacToeProxy } from './proxy.js';
 
 // Network configuration
 let config = new Map([
@@ -84,7 +85,7 @@ const zkAppPrivateKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
 const zkAppPublicKey = zkAppPrivateKey.toPublicKey();
 const zkApp = new TicTacToe(zkAppPublicKey);
 
-console.log('Compile the contract ...');
+console.log('Compile the contract ... (TicTacToe)');
 await TicTacToe.compile();
 
 if(process.argv[3] === "deploy")
@@ -98,8 +99,42 @@ if(process.argv[3] === "deploy")
   }
 
 }
+else if(process.argv[3] === "deploy:proxy") 
+{
+  const zkAppProxyKeysBase58 = await initialZkAppKey('keys/tictactoe-zkAppProxy.key');
+
+  const zkAppProxyPrivateKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
+  const zkAppProxyPublicKey = zkAppProxyPrivateKey.toPublicKey();
+  const zkAppProxy = new TicTacToeProxy(zkAppProxyPublicKey);
+
+  console.log('Compile the contract ... (TicTacToe Proxy)');
+  await TicTacToeProxy.compile();
+  
+
+  try {
+    await deploy(activeConfig, feePayerPrivateKey, 
+        zkAppPrivateKey, zkApp, "Deploy TicTacToe");
+
+    await deploy(activeConfig, feePayerPrivateKey, 
+      zkAppProxyPrivateKey, zkAppProxy, "Deploy TicTacToe (Proxy)");
+
+  } catch (e) {
+    console.log(e);
+  }
+
+
+}
 else if(process.argv[3] === "play:demo:proxy") 
 {
+  const zkAppProxyKeysBase58 = await initialZkAppKey('keys/tictactoe-zkAppProxy.key');
+
+  const zkAppProxyPrivateKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
+  const zkAppProxyPublicKey = zkAppProxyPrivateKey.toPublicKey();
+  const zkAppProxy = new TicTacToeProxy(zkAppProxyPublicKey);
+
+  console.log('Compile the contract ... (TicTacToe Proxy)');
+  await TicTacToeProxy.compile();
+
 
 }
 else if(process.argv[3] === "play:demo") 
@@ -222,38 +257,6 @@ else if(process.argv[2] === "testgql")
     await fetchTestGQL(); 
     // console.log(xyz?.data?.account?.zkappState);
     
-  } catch (e) {
-    console.log(e);
-  }
-
-}
-else if(process.argv[3] === "play:composing") 
-{
-  try {
-
-    let player1PrivateKey;
-    if(process.argv[2] !== "lightnet") 
-    {
-      const player1Keys = await initialKey('keys/tictactoe-player1.key', "player1PrivateKey");
-      player1PrivateKey = PrivateKey.fromBase58(player1Keys.privateKey);
-      console.log(`Load player1PrivateKey ...`);
-
-    } else 
-    {
-      // Player setup
-      player1PrivateKey = (await Lightnet.acquireKeyPair()).privateKey
-      console.log('Acquire player1PrivateKey ...');
-
-    }
-
-    if (player1PrivateKey === undefined) {
-      console.log(commandLineUsage(sections));
-      process.exit(1);
-    }
-    
-    const player1PayerAccount = player1PrivateKey.toPublicKey();
-
-
   } catch (e) {
     console.log(e);
   }

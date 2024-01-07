@@ -1,0 +1,12 @@
+site:
+  title: Antora Docs
+content:
+  sources:
+  - url: https://github.com/zkoracle/opennautilus-contacts.git
+  # - url: <local-path>/opennautilus-contacts
+    branches: [test-tsdoc-antora]
+    start_path: docs
+ui:
+  bundle:
+    url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/HEAD/raw/build/ui-bundle.zip?job=bundle-stable
+    snapshot: true
