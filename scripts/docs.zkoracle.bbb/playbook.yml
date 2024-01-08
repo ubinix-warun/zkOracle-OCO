@@ -7,15 +7,15 @@ site:
     # gtm: 'GTM-W9X5Q6F'
 content:
   sources:
-    - url: .
-      branches: HEAD
-      start_path: components/home
+    # - url: .
+    #   branches: HEAD
+    #   start_path: components/home
 
-    - url: .
-      branches: HEAD
-      start_path: components/learn
+    # - url: .
+    #   branches: HEAD
+    #   start_path: components/learn
 
-    - url: https://github.com/OpenZeppelin/openzeppelin-contracts
+    - url: https://github.com/zkoracle/opennautilus-contacts
       branches: docs-v*
       start_path: docs
 
