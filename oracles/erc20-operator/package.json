@@ -1,0 +1,20 @@
+{
+	"type": "module",
+	"scripts": {
+		"build": "tsc",
+		"buildw": "tsc --watch",
+		"lightnet:up": "zk lightnet start -b berkeley -m single-node",
+		"lightnet:down": "zk lightnet stop && rm keys/basictoken-acquire*",
+		"lightnet:status": "zk lightnet status",
+		"lightnet:deploy": "pnpm run build && node build/src/interact.js lightnet deploy"
+	},
+	"devDependencies": {
+		"ts-node": "^10.9.2",
+		"typescript": "^5.3.3"
+	},
+	"dependencies": {
+		"@types/node": "^20.10.7",
+		"@zkoracle/opennautilus-contracts": "^0.4.3",
+		"o1js": "^0.15.2"
+	}
+}

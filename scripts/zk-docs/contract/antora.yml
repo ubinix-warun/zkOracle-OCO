@@ -1,0 +1,6 @@
+name: zk-docs
+title: Zk Docs
+version: '0.1'
+prerelease: false
+nav:
+  - modules/ROOT/nav.adoc
