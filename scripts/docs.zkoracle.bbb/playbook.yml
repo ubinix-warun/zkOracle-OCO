@@ -15,8 +15,10 @@ content:
     #   branches: HEAD
     #   start_path: components/learn
 
+    # npm i -g @antora/cli@3.1 @antora/site-generator@3.1
+
     - url: https://github.com/zkoracle/opennautilus-contacts
-      branches: docs-v*
+      branches: test-tsdoc-antora
       start_path: docs
 
     # - url: https://github.com/OpenZeppelin/openzeppelin-sdk
