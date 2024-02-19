@@ -29,7 +29,7 @@ jobs:
            
   coverage-erc677:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     steps:
       - name: Set up NodeJS
         uses: actions/setup-node@v2
@@ -58,6 +58,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: oracles/erc677-operator/contracts/coverage
+          destination_dir: coverage
 
         env:
           CI: true
