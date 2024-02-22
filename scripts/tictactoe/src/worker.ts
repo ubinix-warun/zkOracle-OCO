@@ -20,6 +20,7 @@ import {
     Lightnet,
     fetchAccount,
     fetchEvents,
+    SmartContract,
 } from 'o1js';
 import { TicTacToe, Board } from './tictactoe.js';
 import { deploy, fetchTestGQL, initialKeyPairFromLightnet, initialZkAppKey, isFileExists, processTx } from './utils.js';
@@ -49,9 +50,28 @@ const zkApp = new TicTacToe(zkAppPublicKey);
 console.log('Compile the contract ...');
 await TicTacToe.compile();
 
-// Fetch all events for a given address
-const fetchedEvents = await fetchEvents({
-    publicKey: zkAppPublicKey.toBase58(),
-});
+// // Fetch all events for a given address
+// const fetchedEvents = await fetchEvents({
+//     publicKey: zkAppPublicKey.toBase58(),
+// });
 
-console.log(fetchedEvents);
+async function displayEvents(contract: SmartContract) {
+    // let events = await fetchEvents({
+            // publicKey: zkAppPublicKey.toBase58(),
+        // });
+
+    let events = await contract.fetchEvents();
+    // console.log(
+    //   `events on ${contract.address.toBase58()}`,
+      events.map((e) => {
+        console.log(JSON.stringify(e))
+        // return { type: e.type, data: JSON.stringify(e.event) };
+      })
+    // );
+}
+
+await displayEvents(zkApp)
+
+// Got Lastest Block and offset!
+
+// console.log(fetchedEvents);
